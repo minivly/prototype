@@ -1,48 +1,243 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>첫 테스트 페이지</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      background: #f5f5f7;
-      color: #1d1d1f;
-    }
-    .card {
-      text-align: center;
-      padding: 48px 40px;
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 2px 20px rgba(0,0,0,0.08);
-      max-width: 420px;
-    }
-    h1 { font-size: 24px; margin-bottom: 12px; }
-    p { font-size: 15px; color: #6e6e73; line-height: 1.6; }
-    .badge {
-      display: inline-block;
-      margin-top: 16px;
-      padding: 6px 14px;
-      background: #eef4ff;
-      color: #3b6fd6;
-      border-radius: 999px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>작업 모음 — AI 비서실 프로토타입</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  :root{
+    --bg: #14161c;
+    --bg-panel: #1c1f28;
+    --line: #2b2f3a;
+    --text: #e9eaee;
+    --text-dim: #8b8f9c;
+    --accent: #6c63ff;
+    --accent-soft: rgba(108,99,255,0.14);
+    --tag-scenario: #ff9f6b;
+    --tag-app: #5fd0c0;
+    --tag-print: #f2c94c;
+    --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Pretendard', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:880px;
+    margin:0 auto;
+    padding:72px 24px 120px;
+  }
+  header{
+    margin-bottom:56px;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  h1{
+    font-size:34px;
+    font-weight:700;
+    line-height:1.35;
+    margin:0 0 12px;
+    letter-spacing:-0.01em;
+  }
+  header p{
+    color:var(--text-dim);
+    font-size:15px;
+    line-height:1.6;
+    margin:0;
+  }
+  .group{
+    margin-bottom:44px;
+  }
+  .group-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:13px;
+    color:var(--text-dim);
+    margin-bottom:14px;
+    font-family:var(--mono);
+  }
+  .group-title .dot{
+    width:7px;height:7px;border-radius:50%;
+    flex-shrink:0;
+  }
+  .dot.scenario{background:var(--tag-scenario);}
+  .dot.app{background:var(--tag-app);}
+  .dot.print{background:var(--tag-print);}
+
+  .card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 20px;
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:10px;
+    text-decoration:none;
+    color:var(--text);
+    transition:border-color .15s ease, transform .15s ease, background .15s ease;
+  }
+  .card:hover{
+    border-color:var(--accent);
+    background:#20242f;
+    transform:translateX(2px);
+  }
+  .card:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .card-left{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    min-width:0;
+  }
+  .card-title{
+    font-size:15.5px;
+    font-weight:600;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .card-sub{
+    font-size:12.5px;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .arrow{
+    font-family:var(--mono);
+    color:var(--text-dim);
+    font-size:14px;
+    flex-shrink:0;
+    transition:transform .15s ease, color .15s ease;
+  }
+  .card:hover .arrow{
+    color:var(--accent);
+    transform:translateX(3px);
+  }
+  footer{
+    margin-top:60px;
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--text-dim);
+    font-family:var(--mono);
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card, .arrow{transition:none;}
+  }
+</style>
 </head>
 <body>
-  <div class="card">
-    <h1>🎉 세팅 완료!</h1>
-    <p>이 페이지는 Claude와 대화해서 만든 뒤,<br>로컬 저장소 폴더에 저장된 테스트 파일입니다.</p>
-    <p>GitHub Desktop에서 이 변경 사항을 commit &amp; push 하면<br>흐름이 완성됩니다.</p>
-    <span class="badge">index.html · test build</span>
-  </div>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Prototype Index</div>
+    <h1>작업 모음<br>AI 비서실 · 텔레그램 프로토타입</h1>
+    <p>클로드로 만든 목업 페이지들을 한곳에 모아둔 인덱스입니다. 카드를 클릭하면 각 페이지로 이동합니다.</p>
+  </header>
+
+  <!-- ============================================
+       ▼ 새 항목 추가는 여기 배열만 수정하면 됩니다.
+       group: "scenario" | "app" | "print"
+       href: 실제 github pages 파일 경로로 교체하세요
+       ============================================ -->
+  <script>
+    const items = [
+      {
+        group: "scenario",
+        title: "AI 비서실 텔레그램 서비스 기획서",
+        sub: "기획서",
+        href: "ai-secretary-planning.html"
+      },
+      {
+        group: "scenario",
+        title: "일정 에이전트 — 텔레그램 메시지 시나리오",
+        sub: "시나리오",
+        href: "schedule-agent-telegram-scenario.html"
+      },
+      {
+        group: "app",
+        title: "TM Avatar — 구성원의 VOICE 미니앱",
+        sub: "미니앱",
+        href: "tm-avatar-voice.html"
+      },
+      {
+        group: "app",
+        title: "일정 에이전트 — 미니앱 화면 (최종)",
+        sub: "미니앱 · 최종",
+        href: "schedule-agent-miniapp-final.html"
+      },
+      {
+        group: "print",
+        title: "일정 관리 — 달력 프린트 화면 (월간·주간)",
+        sub: "프린트",
+        href: "schedule-calendar-print.html"
+      }
+    ];
+
+    const groupLabels = {
+      scenario: { label: "텔레그램 시나리오 · 기획", dot: "scenario" },
+      app:      { label: "미니앱 화면", dot: "app" },
+      print:    { label: "프린트 화면", dot: "print" }
+    };
+
+    const order = ["scenario", "app", "print"];
+    const container = document.getElementById("groups");
+
+    order.forEach(key => {
+      const groupItems = items.filter(i => i.group === key);
+      if (groupItems.length === 0) return;
+
+      const section = document.createElement("div");
+      section.className = "group";
+
+      const titleEl = document.createElement("div");
+      titleEl.className = "group-title";
+      titleEl.innerHTML = `<span class="dot ${groupLabels[key].dot}"></span>${groupLabels[key].label}`;
+      section.appendChild(titleEl);
+
+      groupItems.forEach(item => {
+        const a = document.createElement("a");
+        a.className = "card";
+        a.href = item.href;
+        a.innerHTML = `
+          <div class="card-left">
+            <span class="card-title">${item.title}</span>
+            <span class="card-sub">${item.sub}</span>
+          </div>
+          <span class="arrow">→</span>
+        `;
+        section.appendChild(a);
+      });
+
+      container.appendChild(section);
+    });
+  </script>
+
+  <div id="groups"></div>
+
+  <footer id="footer-count">
+    각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다
+  </footer>
+  <script>
+    document.getElementById("footer-count").textContent =
+      `총 ${items.length}개 페이지 · 각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다`;
+  </script>
+
+</div>
 </body>
 </html>
