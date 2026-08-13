@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TM Avatar — 구성원의 VOICE 미니앱</title>
+<style>
+  :root{
+    --bg:#F1F3F6; --page-bg:#EBEDF2;
+    --card:#FFFFFF; --sheet-bg:#F7F8FA;
+    --ink:#15171C; --ink-soft:#6B7280; --ink-faint:#9CA3AF;
+    --line:#E6E8ED; --line-soft:#EFF1F5;
+    --blue:#3B6FF2; --blue-soft:#E9EFFE; --blue-strong:#2451D6;
+    --purple:#8B5CF6; --purple-soft:#F1EBFE;
+    --pink:#EC4899; --pink-soft:#FDEAF3;
+    --teal:#14B8A6; --teal-soft:#E4FAF6;
+    --gray-tag:#F0F1F4; --gray-tag-ink:#6B7280;
+    --shadow: 0 1px 2px rgba(15,17,23,.04), 0 14px 32px -16px rgba(15,17,23,.16);
+    --bezel:#0E1015;
+  }
+  /* Dark mode intentionally disabled — this document always renders light, regardless of viewer/system theme. */
+  :root[data-theme="dark"]{
+    --bg:#F1F3F6; --page-bg:#EBEDF2;
+    --card:#FFFFFF; --sheet-bg:#F7F8FA;
+    --ink:#15171C; --ink-soft:#6B7280; --ink-faint:#9CA3AF;
+    --line:#E6E8ED; --line-soft:#EFF1F5;
+    --blue:#3B6FF2; --blue-soft:#E9EFFE; --blue-strong:#2451D6;
+    --purple:#8B5CF6; --purple-soft:#F1EBFE;
+    --pink:#EC4899; --pink-soft:#FDEAF3;
+    --teal:#14B8A6; --teal-soft:#E4FAF6;
+    --gray-tag:#F0F1F4; --gray-tag-ink:#6B7280;
+    --shadow: 0 1px 2px rgba(15,17,23,.04), 0 14px 32px -16px rgba(15,17,23,.16);
+    --bezel:#0E1015;
+  }
+  :root[data-theme="light"]{
+    --bg:#F1F3F6; --page-bg:#EBEDF2;
+    --card:#FFFFFF; --sheet-bg:#F7F8FA;
+    --ink:#15171C; --ink-soft:#6B7280; --ink-faint:#9CA3AF;
+    --line:#E6E8ED; --line-soft:#EFF1F5;
+    --blue:#3B6FF2; --blue-soft:#E9EFFE; --blue-strong:#2451D6;
+    --purple:#8B5CF6; --purple-soft:#F1EBFE;
+    --pink:#EC4899; --pink-soft:#FDEAF3;
+    --teal:#14B8A6; --teal-soft:#E4FAF6;
+    --gray-tag:#F0F1F4; --gray-tag-ink:#6B7280;
+    --shadow: 0 1px 2px rgba(15,17,23,.04), 0 14px 32px -16px rgba(15,17,23,.16);
+    --bezel:#0E1015;
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .doc{ background:var(--bg); color:var(--ink); font-family:'Apple SD Gothic Neo','Pretendard','Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; line-height:1.6; }
+  .mono{ font-family:'SF Mono','Noto Sans Mono CJK KR',ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+  a{ color:var(--blue-strong); }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+
+  .topbar{ position:sticky; top:0; z-index:20; background:color-mix(in srgb, var(--bg) 86%, transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .topbar__inner{ max-width:1180px; margin:0 auto; padding:14px 24px; display:flex; align-items:center; gap:24px; justify-content:space-between; }
+  .topbar__title{ font-size:.92rem; font-weight:700; white-space:nowrap; }
+  .topbar__title span{ color:var(--ink-soft); font-weight:500; margin-left:.5em; }
+  .topnav{ display:flex; gap:18px; overflow-x:auto; scrollbar-width:none; }
+  .topnav::-webkit-scrollbar{ display:none; }
+  .topnav a{ font-size:.78rem; color:var(--ink-soft); text-decoration:none; white-space:nowrap; padding:6px 0; border-bottom:2px solid transparent; }
+  .topnav a:hover{ color:var(--ink); border-color:var(--line); }
+
+  .hero{ padding:44px 0 32px; border-bottom:1px solid var(--line); }
+  .eyebrow{ display:inline-flex; align-items:center; gap:.5em; font-family:'SF Mono','Noto Sans Mono CJK KR',ui-monospace,monospace; font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--blue-strong); margin-bottom:14px; }
+  .eyebrow::before{ content:""; width:20px; height:1px; background:var(--blue-strong); display:inline-block; }
+  h1.title{ font-size:clamp(1.6rem,3.4vw,2.15rem); margin:0 0 12px; font-weight:800; letter-spacing:-.01em; text-wrap:balance; }
+  .lede{ max-width:64ch; color:var(--ink-soft); font-size:.98rem; margin:0 0 18px; }
+  .metarow{ display:flex; flex-wrap:wrap; gap:8px 20px; font-size:.8rem; color:var(--ink-soft); }
+  .metarow b{ color:var(--ink); font-weight:700; }
+
+  section.block{ padding:46px 0; border-bottom:1px solid var(--line); }
+  section.block:last-of-type{ border-bottom:none; }
+  .sec-head{ margin-bottom:24px; max-width:76ch; }
+  .sec-num{ font-family:'SF Mono','Noto Sans Mono CJK KR',ui-monospace,monospace; font-size:.72rem; color:var(--blue-strong); letter-spacing:.07em; display:block; margin-bottom:8px; }
+  h2.sec-title{ font-size:1.42rem; margin:0 0 9px; font-weight:800; letter-spacing:-.01em; text-wrap:balance; }
+  .sec-desc{ color:var(--ink-soft); font-size:.93rem; max-width:74ch; }
+
+  .callout{ background:var(--blue-soft); border:1px solid color-mix(in srgb, var(--blue) 28%, transparent); border-radius:12px; padding:16px 18px; font-size:.87rem; margin-bottom:18px; }
+  .callout strong{ color:var(--blue-strong); }
+  .callout--change{ background:var(--pink-soft); border-color:color-mix(in srgb, var(--pink) 30%, transparent); }
+  .callout--change strong{ color:var(--pink); }
+  .callout--new{ background:var(--teal-soft); border-color:color-mix(in srgb, var(--teal) 32%, transparent); }
+  .callout--new strong{ color:color-mix(in srgb, var(--teal) 70%, black); }
+
+  .mockrow{ display:grid; gap:22px; grid-template-columns:repeat(var(--n,3), minmax(0,1fr)); align-items:start; }
+  .notes{ margin:16px 0 0; padding-left:1.15em; font-size:.85rem; color:var(--ink-soft); }
+  .notes li{ margin-bottom:5px; }
+
+  /* device sheet */
+  .device{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .device__label{ font-size:.76rem; color:var(--ink-soft); text-align:center; font-weight:600; }
+  .sheet{ width:100%; max-width:300px; background:var(--bezel); border-radius:34px; padding:8px; box-shadow:var(--shadow); }
+  .sheet__screen{ background:var(--sheet-bg); border-radius:27px; overflow:hidden; height:640px; display:flex; flex-direction:column; }
+  .sheet__handle{ width:36px; height:4px; border-radius:99px; background:color-mix(in srgb, var(--ink-faint) 60%, transparent); margin:9px auto 4px; flex:0 0 auto; }
+  .sheet__head{ display:flex; align-items:center; justify-content:space-between; padding:6px 14px 10px; flex:0 0 auto; }
+  .sheet__iconbtn{ width:26px; height:26px; border-radius:50%; background:var(--gray-tag); display:flex; align-items:center; justify-content:center; font-size:.72rem; color:var(--ink-soft); flex:0 0 auto; }
+  .sheet__headmid{ text-align:center; }
+  .sheet__headtitle{ font-size:.82rem; font-weight:800; }
+  .sheet__headsub{ font-size:.62rem; color:var(--ink-faint); margin-top:1px; }
+  .sheet__body{ flex:1 1 auto; overflow-y:auto; padding:2px 14px 18px; }
+
+  .m-tabs{ display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; padding:6px 0 12px; }
+  .m-tabs::-webkit-scrollbar{ display:none; }
+  .m-tab{ flex:0 0 auto; font-size:.72rem; font-weight:700; padding:6px 13px; border-radius:999px; background:var(--card); color:var(--ink-soft); border:1px solid var(--line); }
+  .m-tab--active{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  .m-range{ text-align:center; font-size:.64rem; color:var(--ink-faint); margin-bottom:14px; }
+
+  .stat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:20px; }
+  .stat-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:11px 8px; text-align:center; }
+  .stat-card__icon{ width:30px; height:30px; border-radius:9px; display:flex; align-items:center; justify-content:center; margin:0 auto 7px; font-size:.8rem; }
+  .stat-card__label{ font-size:.6rem; color:var(--ink-soft); margin-bottom:3px; }
+  .stat-card__value{ font-size:.92rem; font-weight:800; }
+
+  .m-h3{ font-size:.88rem; font-weight:800; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+  .top5-badge{ font-size:.58rem; font-weight:800; color:var(--blue-strong); background:var(--blue-soft); padding:2px 7px; border-radius:6px; letter-spacing:.02em; }
+
+  .kw-box{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-bottom:20px; display:flex; flex-wrap:wrap; gap:9px 12px; align-items:baseline; }
+  .kw{ font-weight:700; white-space:nowrap; }
+  .kw-xl{ font-size:1.15rem; } .kw-l{ font-size:.98rem; } .kw-m{ font-size:.85rem; } .kw-s{ font-size:.74rem; font-weight:600; } .kw-xs{ font-size:.68rem; font-weight:500; }
+  .kw-blue{ color:var(--blue); } .kw-purple{ color:var(--purple); } .kw-pink{ color:var(--pink); } .kw-teal{ color:var(--teal); } .kw-gray{ color:var(--ink-faint); }
+
+  .rank-list{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:6px 14px; margin-bottom:20px; }
+  .rank-row{ display:flex; align-items:center; gap:10px; padding:9px 0; border-top:1px solid var(--line-soft); }
+  .rank-row:first-child{ border-top:none; }
+  .rank-num{ width:18px; height:18px; border-radius:50%; background:var(--blue-soft); color:var(--blue-strong); font-size:.62rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .rank-label{ font-size:.74rem; font-weight:600; flex:0 0 auto; width:78px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rank-bar-track{ flex:1 1 auto; height:6px; border-radius:99px; background:var(--line-soft); overflow:hidden; }
+  .rank-bar-fill{ height:100%; border-radius:99px; background:linear-gradient(90deg, var(--blue), var(--purple)); }
+  .rank-bar-fill--co{ background:linear-gradient(90deg, var(--pink), var(--purple)); }
+  .rank-bar-fill--av{ background:linear-gradient(90deg, var(--teal), var(--blue)); }
+  .rank-count{ font-size:.68rem; color:var(--ink-soft); font-weight:700; flex:0 0 auto; width:34px; text-align:right; }
+
+  .dir-list{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:2px 14px; }
+  .dir-row{ display:flex; align-items:center; gap:10px; padding:12px 0; border-top:1px solid var(--line-soft); }
+  .dir-row:first-child{ border-top:none; }
+  .dir-row__dot{ width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+  .dir-row__label{ flex:1 1 auto; font-size:.78rem; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dir-row__count{ font-size:.7rem; color:var(--ink-soft); font-weight:700; flex:0 0 auto; }
+  .dir-row__arrow{ color:var(--ink-faint); font-size:.85rem; flex:0 0 auto; }
+  .dir-more{ text-align:center; font-size:.68rem; color:var(--ink-faint); padding:10px 0 2px; }
+
+  .trend-row{ display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--line-soft); }
+  .trend-row:first-child{ border-top:none; }
+  .trend-row__num{ width:18px; height:18px; border-radius:50%; background:var(--pink-soft); color:var(--pink); font-size:.62rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .trend-row__main{ flex:1 1 auto; min-width:0; }
+  .trend-row__kw{ font-size:.76rem; font-weight:700; }
+  .trend-row__sub{ font-size:.62rem; color:var(--ink-faint); margin-top:1px; font-variant-numeric:tabular-nums; }
+  .trend-chip{ font-size:.66rem; font-weight:800; padding:3px 8px; border-radius:7px; background:var(--pink-soft); color:var(--pink); white-space:nowrap; flex:0 0 auto; font-variant-numeric:tabular-nums; }
+  .trend-chip--new{ background:var(--teal-soft); color:color-mix(in srgb, var(--teal) 62%, black); }
+
+  .detail-head{ margin-bottom:4px; }
+  .detail-title{ font-size:1.05rem; font-weight:800; margin:2px 0 9px; }
+  .tagrow{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+  .pill{ font-size:.62rem; font-weight:700; padding:4px 9px; border-radius:999px; background:var(--gray-tag); color:var(--gray-tag-ink); white-space:nowrap; }
+  .pill--rank{ background:var(--blue); color:#fff; }
+  .list-toolbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .list-toolbar__count{ font-size:.78rem; font-weight:700; }
+  .list-toolbar__sort{ font-size:.68rem; color:var(--ink-soft); }
+
+  .chip-row{ display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin-bottom:12px; }
+  .chip-row::-webkit-scrollbar{ display:none; }
+  .chip{ flex:0 0 auto; font-size:.68rem; font-weight:700; padding:6px 12px; border-radius:999px; border:1px solid var(--line); color:var(--ink-soft); background:var(--card); white-space:nowrap; }
+  .chip--active{ background:var(--blue); color:#fff; border-color:var(--blue); }
+
+  .qa-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:13px; margin-bottom:10px; }
+  .qa-top{ display:flex; align-items:center; gap:7px; margin-bottom:8px; }
+  .cat-tag{ font-size:.6rem; font-weight:800; padding:3px 8px; border-radius:6px; }
+  .cat-tag--blue{ background:var(--blue-soft); color:var(--blue-strong); }
+  .cat-tag--purple{ background:var(--purple-soft); color:var(--purple); }
+  .cat-tag--teal{ background:var(--teal-soft); color:color-mix(in srgb, var(--teal) 55%, black); }
+  .cat-date{ font-size:.62rem; color:var(--ink-faint); }
+  .qa-row{ display:flex; gap:8px; align-items:flex-start; margin-bottom:8px; }
+  .qa-row:last-of-type{ margin-bottom:0; }
+  .qa-icon{ width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.6rem; font-weight:800; color:#fff; flex:0 0 auto; margin-top:1px; }
+  .qa-icon--q{ background:var(--blue); }
+  .qa-icon--a{ background:var(--teal); }
+  .qa-text{ font-size:.76rem; line-height:1.55; }
+  .qa-text--q{ font-weight:700; }
+  .qa-avatar-name{ font-size:.72rem; font-weight:800; margin-bottom:2px; }
+  .qa-answer{ color:var(--ink-soft); font-size:.73rem; line-height:1.6; }
+  .qa-more{ color:var(--blue-strong); font-weight:700; }
+  .qa-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding-top:9px; border-top:1px solid var(--line-soft); }
+  .qa-submitter{ font-size:.66rem; color:var(--ink-faint); }
+  .status-pill{ font-size:.6rem; font-weight:700; padding:4px 9px; border-radius:999px; border:1px solid var(--line); color:var(--ink-soft); white-space:nowrap; }
+  .status-pill--done{ background:var(--line-soft); color:var(--ink-faint); border-color:transparent; }
+  .status-pill--wait{ background:var(--pink-soft); color:var(--pink); border-color:transparent; }
+  .status-pill--review{ background:var(--blue-soft); color:var(--blue-strong); border-color:transparent; }
+  .action-banner{ display:flex; align-items:center; gap:11px; background:linear-gradient(135deg, var(--pink-soft), var(--purple-soft)); border:1px solid color-mix(in srgb, var(--pink) 30%, transparent); border-radius:14px; padding:12px 13px; margin-bottom:18px; }
+  .action-banner__icon{ width:32px; height:32px; border-radius:9px; background:var(--pink); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.85rem; flex:0 0 auto; }
+  .action-banner__title{ font-size:.76rem; font-weight:800; }
+  .action-banner__sub{ font-size:.64rem; color:var(--ink-soft); margin-top:1px; }
+  .action-banner__arrow{ margin-left:auto; color:var(--pink); font-size:.9rem; }
+  .status-tabs{ display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin-bottom:12px; }
+  .status-tabs::-webkit-scrollbar{ display:none; }
+  .cat-tag--noai{ background:var(--pink-soft); color:var(--pink); }
+  .office-note{ background:var(--purple-soft); border-radius:10px; padding:11px 12px; font-size:.75rem; line-height:1.65; color:var(--ink); margin-bottom:2px; }
+  .office-note__label{ font-size:.64rem; font-weight:800; color:var(--purple); margin-bottom:5px; display:flex; align-items:center; gap:5px; }
+  .office-note__time{ font-size:.6rem; color:var(--ink-faint); margin-top:7px; }
+  .qa-card--tappable{ position:relative; }
+  .qa-tap-hint{ position:absolute; top:13px; right:13px; font-size:.7rem; color:var(--ink-faint); }
+
+  .d-back{ display:flex; align-items:center; gap:6px; font-size:.72rem; color:var(--ink-soft); margin-bottom:10px; font-weight:600; }
+  .d-qcard{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:16px; }
+  .d-qtext{ font-size:.88rem; font-weight:800; line-height:1.5; margin:8px 0 10px; }
+  .d-meta{ font-size:.68rem; color:var(--ink-faint); }
+
+  .section-card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px; }
+  .section-card__label{ display:flex; align-items:center; gap:7px; font-size:.72rem; font-weight:800; margin-bottom:10px; }
+  .section-dot{ width:7px; height:7px; border-radius:50%; flex:0 0 auto; }
+  .dot--existing{ background:var(--teal); }
+  .dot--mine{ background:var(--blue); }
+  .dot--comment{ background:var(--pink); }
+  .section-card__existing-name{ font-size:.75rem; font-weight:800; margin-bottom:5px; }
+  .section-card__body-text{ font-size:.76rem; line-height:1.7; color:var(--ink); }
+
+  .mini-textarea{ width:100%; min-height:74px; border:1px solid var(--line); border-radius:10px; background:var(--sheet-bg); padding:9px 10px; font-size:.75rem; line-height:1.6; color:var(--ink-faint); font-family:inherit; resize:none; }
+  .mini-textarea--comment{ min-height:56px; }
+  .mini-btn-row{ display:flex; justify-content:flex-end; margin-top:9px; }
+  .mini-btn{ font-size:.68rem; font-weight:800; padding:7px 14px; border-radius:9px; border:none; }
+  .mini-btn--primary{ background:var(--blue); color:#fff; }
+  .mini-btn--outline{ background:transparent; color:var(--blue-strong); border:1px solid var(--blue); }
+  .answered-box{ background:var(--blue-soft); border-radius:10px; padding:10px 11px; font-size:.76rem; line-height:1.65; color:var(--ink); position:relative; }
+  .answered-edit{ position:absolute; top:9px; right:10px; font-size:.64rem; color:var(--blue-strong); font-weight:700; }
+  .answered-time{ font-size:.6rem; color:var(--ink-faint); margin-top:7px; }
+
+  footer.doc-foot{ padding:30px 0 52px; color:var(--ink-soft); font-size:.8rem; }
+
+  @media (max-width:920px){
+    .mockrow{ grid-template-columns:1fr !important; max-width:300px; margin:0 auto; }
+    .topbar__title span{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__title">TM Avatar<span>구성원의 VOICE 미니앱 · v1.6</span></div>
+      <nav class="topnav">
+        <a href="#existing">기존 구조</a>
+        <a href="#change">변경 — 리스트 간소화</a>
+        <a href="#new">신규 — 질문 상세</a>
+        <a href="#noai-tab">신규 — AI 답변 불가 탭</a>
+        <a href="#stat-drilldown">신규 — 통계 카드 드릴다운</a>
+        <a href="#trending">신규 — 급상승 키워드</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">TM AVATAR · 구성원 문답 아바타</div>
+      <h1 class="title">TM Avatar — 구성원의 VOICE 미니앱</h1>
+      <p class="lede">구성원이 여러 Avatar(그룹 회장·계열사 의장·대외 오피니언 리더 등)에게 남긴 질문과 답변을 키워드·회사·Avatar 기준으로 모아보는 미니앱입니다. 이번 라운드는 기존 리스트 화면에서 질문만 남기고, 질문을 눌렀을 때 열리는 신규 상세 화면을 설계합니다.</p>
+      <div class="metarow">
+        <span><b>버전</b> v1.6</span>
+        <span><b>작성일</b> 2026-08-10</span>
+        <span><b>기준 데이터</b> 2026-07-01~2026-07-31 (7월)</span>
+      </div>
+    </section>
+
+    <section class="block" id="conventions" style="padding:28px 0;">
+      <div class="callout">
+        <strong>날짜·시간 표기 규칙</strong> — 이 미니앱의 문의 목록·타임스탬프는 <b>연도부터 시작하는 <span class="mono">yyyy-mm-dd</span></b> 형식으로 통일합니다. 시각이 함께 필요하면 <span class="mono">yyyy-mm-dd hh:mm</span>(예: <span class="mono">2026-07-20 14:02</span>), <b>시각이 없으면 날짜까지만</b>(예: <span class="mono">2026-07-20</span>) 씁니다. <span class="mono">8월 4일(화)</span> 같은 한글+요일 형식은 <b>대화체 문장에서만</b> 쓰고(일정 에이전트의 챗 메시지 등), 이 문서처럼 목록·로그 성격의 데이터에는 쓰지 않습니다.
+      </div>
+    </section>
+
+    <!-- EXISTING -->
+    <section class="block" id="existing">
+      <div class="sec-head">
+        <span class="sec-num">01 · 기존 구조</span>
+        <h2 class="sec-title">전달받은 화면 — 리스트에 질문+답변이 함께 노출</h2>
+        <p class="sec-desc">키워드별·회사별·Avatar별로 보기 세 가지 진입 경로 모두 같은 카드 형식을 씁니다. 지금은 카드 한 장 안에 질문(Q)과 이미 작성된 답변(A) 미리보기가 함께 들어가 있습니다.</p>
+      </div>
+      <div class="mockrow" style="--n:2">
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">✕</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">구성원의 VOICE</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="m-tabs">
+                <div class="m-tab">4월</div><div class="m-tab">5월</div><div class="m-tab">6월</div>
+                <div class="m-tab m-tab--active">7월</div><div class="m-tab">8월</div>
+              </div>
+              <div class="m-range">2026-07-01~2026-07-31 기준</div>
+              <div class="stat-grid">
+                <div class="stat-card"><div class="stat-card__icon" style="background:var(--blue-soft); color:var(--blue-strong);">✉</div><div class="stat-card__label">총 문의</div><div class="stat-card__value">247건</div></div>
+                <div class="stat-card"><div class="stat-card__icon" style="background:var(--purple-soft); color:var(--purple);">▤</div><div class="stat-card__label">카테고리</div><div class="stat-card__value">18개</div></div>
+                <div class="stat-card"><div class="stat-card__icon" style="background:var(--teal-soft); color:var(--teal);">▥</div><div class="stat-card__label">문의 회사</div><div class="stat-card__value">42개</div></div>
+              </div>
+              <div class="m-h3">키워드</div>
+              <div class="kw-box">
+                <span class="kw kw-xl kw-blue">AI 전략</span>
+                <span class="kw kw-l kw-blue">조직개편</span>
+                <span class="kw kw-l kw-purple">반도체</span>
+                <span class="kw kw-s kw-gray">사내문화</span>
+                <span class="kw kw-s kw-gray">출장비</span>
+                <span class="kw kw-s kw-gray">보안규정</span>
+                <span class="kw kw-m kw-pink">급여체계</span>
+                <span class="kw kw-l kw-pink">성과평가</span>
+                <span class="kw kw-s kw-gray">부서이동</span>
+                <span class="kw kw-s kw-purple">교육지원</span>
+                <span class="kw kw-s kw-gray">휴가정책</span>
+                <span class="kw kw-m kw-blue">구성원 역량</span>
+                <span class="kw kw-s kw-purple">워라밸</span>
+                <span class="kw kw-s kw-teal">채용계획</span>
+                <span class="kw kw-xs kw-purple">연봉협상</span>
+                <span class="kw kw-xs kw-gray">직급체계</span>
+                <span class="kw kw-xs kw-gray">퇴직금</span>
+              </div>
+              <div class="m-h3">가장 많이 언급된 키워드 <span class="top5-badge">TOP 5</span></div>
+              <div class="rank-list">
+                <div class="rank-row"><span class="rank-num">1</span><span class="rank-label">성과평가</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:92%"></span></span><span class="rank-count mono">48건</span></div>
+                <div class="rank-row"><span class="rank-num">2</span><span class="rank-label">AI 전략</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:78%"></span></span><span class="rank-count mono">41건</span></div>
+                <div class="rank-row"><span class="rank-num">3</span><span class="rank-label">구성원 역량</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:67%"></span></span><span class="rank-count mono">35건</span></div>
+                <div class="rank-row"><span class="rank-num">4</span><span class="rank-label">반도체</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:52%"></span></span><span class="rank-count mono">28건</span></div>
+                <div class="rank-row"><span class="rank-num">5</span><span class="rank-label">승진기준</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:40%"></span></span><span class="rank-count mono">22건</span></div>
+              </div>
+              <div class="m-h3">급상승 키워드 <span class="top5-badge" style="background:var(--pink-soft); color:var(--pink);">전월 대비</span></div>
+              <div class="rank-list">
+                <div class="trend-row">
+                  <span class="trend-row__num">1</span>
+                  <span class="trend-row__main"><span class="trend-row__kw">조직개편</span><span class="trend-row__sub">6월 3건 → 7월 19건</span></span>
+                  <span class="trend-chip">▲ 16건</span>
+                </div>
+                <div class="trend-row">
+                  <span class="trend-row__num">2</span>
+                  <span class="trend-row__main"><span class="trend-row__kw">급여체계</span><span class="trend-row__sub">6월 6건 → 7월 17건</span></span>
+                  <span class="trend-chip">▲ 11건</span>
+                </div>
+                <div class="trend-row">
+                  <span class="trend-row__num">3</span>
+                  <span class="trend-row__main"><span class="trend-row__kw">보안 가이드라인</span><span class="trend-row__sub">6월 문의 없음 → 7월 9건</span></span>
+                  <span class="trend-chip trend-chip--new">NEW 9건</span>
+                </div>
+              </div>
+              <div class="m-h3">가장 문의가 많은 회사 <span class="top5-badge">TOP 5</span></div>
+              <div class="rank-list">
+                <div class="rank-row"><span class="rank-num">1</span><span class="rank-label">SK하이닉스</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--co" style="width:88%"></span></span><span class="rank-count mono">32건</span></div>
+                <div class="rank-row"><span class="rank-num">2</span><span class="rank-label">SK텔레콤</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--co" style="width:74%"></span></span><span class="rank-count mono">27건</span></div>
+                <div class="rank-row"><span class="rank-num">3</span><span class="rank-label">SK이노베이션 E&amp;S</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--co" style="width:65%"></span></span><span class="rank-count mono">24건</span></div>
+                <div class="rank-row"><span class="rank-num">4</span><span class="rank-label">SK에코엔지니어링</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--co" style="width:52%"></span></span><span class="rank-count mono">19건</span></div>
+                <div class="rank-row"><span class="rank-num">5</span><span class="rank-label">SK</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--co" style="width:40%"></span></span><span class="rank-count mono">15건</span></div>
+              </div>
+              <div class="m-h3">가장 답변이 많은 Avatar</div>
+              <div class="rank-list">
+                <div class="rank-row"><span class="rank-num">1</span><span class="rank-label" style="width:96px;">SK하이닉스 이사회...</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--av" style="width:88%"></span></span><span class="rank-count mono">32건</span></div>
+                <div class="rank-row"><span class="rank-num">2</span><span class="rank-label" style="width:96px;">그룹 회장 Avatar</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--av" style="width:74%"></span></span><span class="rank-count mono">27건</span></div>
+                <div class="rank-row"><span class="rank-num">3</span><span class="rank-label" style="width:96px;">대외 오피니언 리더...</span><span class="rank-bar-track"><span class="rank-bar-fill rank-bar-fill--av" style="width:65%"></span></span><span class="rank-count mono">24건</span></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">메인 대시보드</div>
+        </div>
+
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">✕</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">AVATAR별로 보기</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="detail-title">그룹 회장 Avatar ⌄</div>
+              <div class="tagrow">
+                <span class="pill">총 8건</span><span class="pill">7월 기준</span><span class="pill pill--rank">랭킹 1위</span>
+              </div>
+              <div class="chip-row">
+                <div class="chip chip--active">전체</div><div class="chip">AI 전략</div><div class="chip">반도체·지정학</div><div class="chip">사회 변화</div>
+              </div>
+              <div class="list-toolbar"><span class="list-toolbar__count">전체 8건</span><span class="list-toolbar__sort">최신순 ⌄</span></div>
+
+              <div class="qa-card">
+                <div class="qa-top"><span class="cat-tag cat-tag--blue">AI 전략</span><span class="cat-date">2026-07-23</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">AI 시대에 우리 그룹이 반드시 확보해야 할 핵심 경쟁력은 무엇인가요?</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--a">A</span><div><div class="qa-avatar-name">그룹 회장 Avatar</div><div class="qa-answer">제가 가장 중요하게 보는 경쟁력은 AI 기술 하나를 잘 만드는 능력이 아니라, 그룹이 가진 역량을 하나의 고객 가치로 연결하는 능력입니다. <span class="qa-more">…더보기</span></div></div></div>
+                <div class="qa-foot"><span class="qa-submitter">김** · SK하이닉스</span><span class="status-pill">비서실로 전달</span></div>
+              </div>
+              <div class="qa-card">
+                <div class="qa-top"><span class="cat-tag cat-tag--blue">AI 전략</span><span class="cat-date">2026-07-22</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">구성원은 어떤 역량을 준비해야 하나요?</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--a">A</span><div><div class="qa-avatar-name">그룹 회장 Avatar</div><div class="qa-answer">모든 구성원이 AI 개발자가 될 필요는 없습니다. 자신이 맡은 산업과 고객을 깊이 이해하고… <span class="qa-more">…더보기</span></div></div></div>
+                <div class="qa-foot"><span class="qa-submitter">이** · SK텔레콤</span><span class="status-pill status-pill--done">비서실 전달 완료</span></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">Avatar별로 보기 (기존)</div>
+        </div>
+      </div>
+      <ul class="notes">
+        <li>키워드별·회사별·Avatar별 보기는 상단 필터만 다르고 카드 형식은 동일합니다 — 아래 변경 사항은 세 화면 모두에 똑같이 적용됩니다.</li>
+      </ul>
+    </section>
+
+    <!-- CHANGE -->
+    <section class="block" id="change">
+      <div class="sec-head">
+        <span class="sec-num">02 · 변경</span>
+        <h2 class="sec-title">리스트는 질문만 — 답변은 상세 화면으로</h2>
+        <p class="sec-desc">카드에서 A(답변) 영역을 빼고 Q(질문)만 남깁니다. 카드 자체가 눌러서 들어가는 진입점이 되므로, 오른쪽 화살표로 탭 가능함을 표시합니다.</p>
+      </div>
+      <div class="callout callout--change">
+        <strong>기존 → 변경</strong> 리스트 카드 안에 있던 "A · 아바타 이름 + 답변 미리보기 · …더보기" 블록을 통째로 제거합니다. 카드에는 카테고리 태그·날짜·질문·작성자·전달상태만 남고, 답변 전체 내용은 §03의 상세 화면에서만 보여줍니다.
+      </div>
+      <div class="mockrow" style="--n:1">
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">✕</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">AVATAR별로 보기</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="detail-title">그룹 회장 Avatar ⌄</div>
+              <div class="tagrow">
+                <span class="pill">총 8건</span><span class="pill">7월 기준</span><span class="pill pill--rank">랭킹 1위</span>
+              </div>
+              <div class="chip-row">
+                <div class="chip chip--active">전체</div><div class="chip">AI 전략</div><div class="chip">반도체·지정학</div><div class="chip">사회 변화</div>
+              </div>
+              <div class="list-toolbar"><span class="list-toolbar__count">전체 8건</span><span class="list-toolbar__sort">최신순 ⌄</span></div>
+
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--blue">AI 전략</span><span class="cat-date">2026-07-23</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">AI 시대에 우리 그룹이 반드시 확보해야 할 핵심 경쟁력은 무엇인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">김** · SK하이닉스</span><span class="status-pill">비서실로 전달</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--blue">AI 전략</span><span class="cat-date">2026-07-22</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">구성원은 어떤 역량을 준비해야 하나요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">이** · SK텔레콤</span><span class="status-pill status-pill--done">비서실 전달 완료</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--purple">반도체·지정학</span><span class="cat-date">2026-07-17</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">미국과 중국의 기술 경쟁이 SK하이닉스에 미치는 가장 큰 영향은 무엇인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">박** · SK하이닉스</span><span class="status-pill">비서실로 전달</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--teal">사회 변화</span><span class="cat-date">2026-07-15</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">앞으로 우리 사업에 가장 큰 영향을 줄 사회 변화는 무엇인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">최** · SK</span><span class="status-pill">비서실로 전달</span></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">Avatar별로 보기 (변경 후 — 질문만)</div>
+        </div>
+      </div>
+      <ul class="notes">
+        <li>카드 높이가 짧아져 한 화면에 더 많은 질문이 보입니다 — 스캔하기엔 유리하지만, 어떤 질문에 이미 좋은 답이 달려있는지는 상세로 들어가야 알 수 있습니다.</li>
+        <li>전달 상태 배지("비서실로 전달"/"비서실 전달 완료")는 그대로 리스트에 남겨, 상세로 들어가지 않아도 처리 상태는 한눈에 보이게 합니다.</li>
+      </ul>
+    </section>
+
+    <!-- NEW -->
+    <section class="block" id="new">
+      <div class="sec-head">
+        <span class="sec-num">03 · 신규</span>
+        <h2 class="sec-title">질문 상세 화면</h2>
+        <p class="sec-desc">질문 카드를 누르면 열리는 화면입니다. 위에서부터 <b>①이미 작성된 답변 → ②내가 직접 남기는 답변 → ③비서실 전달 코멘트</b> 순으로 쌓입니다. ②는 아직 답변 전이면 입력창, 이미 답변했으면 그 내용을 보여주는 두 가지 상태가 있습니다.</p>
+      </div>
+      <div class="callout callout--new">
+        <strong>세 영역의 역할이 다릅니다</strong> — ①은 시스템이 이미 갖고 있는 답변(예: 과거 발언 기반 자동 생성), ②는 이 질문에 대해 회장님이 직접 새로 남기는 답변, ③은 답변 내용이 아니라 <b>비서실에 전달할 때 함께 붙이는 메모</b>입니다. 세 가지를 한 텍스트박스에 섞지 않습니다.
+      </div>
+      <div class="mockrow" style="--n:2">
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">‹</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">질문 상세</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="d-qcard">
+                <div class="tagrow" style="margin-bottom:6px;"><span class="cat-tag cat-tag--blue">AI 전략</span><span class="cat-date">2026-07-23</span></div>
+                <div class="d-qtext">AI 시대에 우리 그룹이 반드시 확보해야 할 핵심 경쟁력은 무엇인가요?</div>
+                <div class="d-meta">김** · SK하이닉스 &nbsp;·&nbsp; <span class="status-pill" style="margin-left:2px;">비서실로 전달</span></div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--existing"></span>① 이미 작성된 답변 · 그룹 회장 Avatar</div>
+                <div class="section-card__body-text">제가 가장 중요하게 보는 경쟁력은 AI 기술 하나를 잘 만드는 능력이 아니라, 그룹이 가진 역량을 하나의 고객 가치로 연결하는 능력입니다. 우리 그룹에는 반도체와 메모리, 통신과 네트워크, 데이터센터, 에너지, 제조 현장이 있습니다. 이걸 따로따로의 사업이 아니라 하나의 AI 밸류체인으로 엮어낼 수 있느냐가 핵심 경쟁력이라고 봅니다.</div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--mine"></span>② 내 답변 작성</div>
+                <textarea class="mini-textarea" placeholder="이 질문에 대해 직접 답변을 남기시겠어요?" readonly></textarea>
+                <div class="mini-btn-row"><button class="mini-btn mini-btn--primary">답변 등록</button></div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--comment"></span>③ 비서실 전달 코멘트</div>
+                <textarea class="mini-textarea mini-textarea--comment" placeholder="비서실에 함께 전달할 메모가 있다면 남겨주세요 (선택)" readonly></textarea>
+                <div class="mini-btn-row"><button class="mini-btn mini-btn--outline">비서실로 전달</button></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">답변 전 — ② 입력창 상태</div>
+        </div>
+
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">‹</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">질문 상세</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="d-qcard">
+                <div class="tagrow" style="margin-bottom:6px;"><span class="cat-tag cat-tag--purple">반도체·지정학</span><span class="cat-date">2026-07-17</span></div>
+                <div class="d-qtext">미국과 중국의 기술 경쟁이 SK하이닉스에 미치는 가장 큰 영향은 무엇인가요?</div>
+                <div class="d-meta">박** · SK하이닉스 &nbsp;·&nbsp; <span class="status-pill status-pill--done" style="margin-left:2px;">비서실 전달 완료</span></div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--existing"></span>① 이미 작성된 답변 · SK하이닉스 이사회 의장 Avatar</div>
+                <div class="section-card__body-text">가장 큰 영향은 단순히 미국 시장과 중국 시장 중 하나를 선택해야 한다는 것이 아닙니다. 핵심은 하나의 기술·생산·고객 체계를 서로 다른 규제와 산업정책 아래에서 동시에 운영해야 한다는 복잡성이 커지고 있다는 점입니다.</div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--mine"></span>② 내 답변</div>
+                <div class="answered-box">
+                  <span class="answered-edit">수정</span>
+                  이사회 의장 Avatar 답변에 더해, 저는 이 질문을 "선택"이 아니라 "이중 운영 역량"의 문제로 봅니다. 어느 한쪽에 베팅하기보다, 두 체계 모두에서 흔들리지 않을 공급망 이원화를 이미 진행 중입니다.
+                  <div class="answered-time">2026-07-20 14:02 작성</div>
+                </div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--comment"></span>③ 비서실 전달 코멘트</div>
+                <div class="answered-box" style="background:var(--pink-soft);">
+                  <span class="answered-edit" style="color:var(--pink);">수정</span>
+                  민감한 소재라 외부 공개 전에 홍보팀 검수 한 번 더 부탁드립니다.
+                  <div class="answered-time">2026-07-20 14:03 작성 · 비서실 전달 완료</div>
+                </div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">답변 후 — ② 내용 노출 상태</div>
+        </div>
+      </div>
+      <ul class="notes">
+        <li><b>②를 한 번 등록하고 나면 입력창 대신 작성된 내용 + "수정" 링크로 바뀝니다</b> — 같은 자리, 같은 컴포넌트의 두 가지 상태입니다.</li>
+        <li>③은 답변을 등록하지 않아도 남길 수 있습니다 — "답변은 ①(기존 Avatar 답변) 그대로 내보내되, 이 부분만 비서실이 확인해줬으면 좋겠다"는 식의 지시가 가능해야 하기 때문입니다.</li>
+        <li>③을 전달하면 리스트의 상태 배지가 "비서실로 전달" → "비서실 전달 완료"로 바뀌는 것으로 가정합니다 (§01·§02 리스트와 동일한 배지).</li>
+      </ul>
+
+      <div class="sec-head" style="margin-top:40px;">
+        <h3 class="sec-title" style="font-size:1.15rem;">아바타가 답변하지 못해 비서실을 거쳐 올라온 질문</h3>
+        <p class="sec-desc">위 화면은 <b>①이미 작성된 답변이 있다는 전제</b>였습니다. 그런데 AI가 아예 답변을 만들지 못해 비서실이 회장님께 직접 확인을 요청하는 경우도 있습니다 — 이땐 ①이 없으므로, 답변 작성이 화면의 주가 됩니다.</p>
+      </div>
+      <div class="mockrow" style="--n:1">
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">‹</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">직접 답변 필요</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="d-qcard">
+                <div class="tagrow" style="margin-bottom:6px;"><span class="cat-tag cat-tag--noai">AI 답변 불가</span><span class="cat-date">2026-07-29</span></div>
+                <div class="d-qtext">이번 하반기 성과급 지급률은 정확히 몇 %인가요?</div>
+                <div class="d-meta">정** · SK이노베이션 E&amp;S &nbsp;·&nbsp; <span class="status-pill status-pill--wait" style="margin-left:2px;">회장님 답변 대기</span></div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--comment"></span>비서실에서 전달한 요청</div>
+                <div class="office-note">
+                  이 질문은 구체적인 지급률 수치를 요구하고 있어, 기존 발언 기반 자동응답으로는 답변이 어렵습니다. 회장님께서 직접 톤을 정해 답변해 주시면, 확인 후 바로 노출하겠습니다.
+                  <div class="office-note__time">비서실 · 2026-07-29 09:40 전달</div>
+                </div>
+              </div>
+
+              <div class="section-card">
+                <div class="section-card__label"><span class="section-dot dot--mine"></span>답변 작성</div>
+                <textarea class="mini-textarea" style="min-height:96px;" placeholder="이 질문에 대한 답변을 작성해주세요" readonly></textarea>
+                <div class="mini-btn-row"><button class="mini-btn mini-btn--primary">답변 제출 · 비서실 확인 요청</button></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">아바타 답변 없음 → 회장님이 처음부터 작성</div>
+        </div>
+      </div>
+      <ul class="notes">
+        <li><b>①(이미 작성된 답변) 섹션 자체가 없습니다</b> — 대신 그 자리에 비서실이 이 질문을 왜 올렸는지 설명하는 노트가 들어갑니다. 회장님 답변 섹션은 입력창 하나로 화면의 중심이 됩니다.</li>
+        <li>버튼 문구를 "답변 등록"이 아니라 <b>"답변 제출 · 비서실 확인 요청"</b>으로 바꿨습니다 — 원래 흐름대로면 회장님이 쓴 답변도 비서실 확인을 한 번 더 거친 뒤 구성원에게 노출되기 때문입니다.</li>
+        <li>제출 후에는 상태 배지가 "회장님 답변 대기" → "비서실 확인 중" → (확인 완료 시) "답변 완료" 순으로 바뀌는 것으로 가정합니다 — 정확한 단계 명칭은 확인이 필요합니다.</li>
+      </ul>
+    </section>
+
+    <!-- NOAI TAB -->
+    <section class="block" id="noai-tab">
+      <div class="sec-head">
+        <span class="sec-num">04 · 신규</span>
+        <h2 class="sec-title">"AI 답변 불가" 전용 탭</h2>
+        <p class="sec-desc">직접 답변이 필요한 질문만 따로 모아보는 화면입니다. 메인 대시보드에 진입 배너를 추가하고, 눌렀을 때 상태별로 걸러볼 수 있는 전용 리스트가 열립니다.</p>
+      </div>
+      <div class="mockrow" style="--n:2">
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">✕</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">구성원의 VOICE</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="m-tabs">
+                <div class="m-tab">4월</div><div class="m-tab">5월</div><div class="m-tab">6월</div>
+                <div class="m-tab m-tab--active">7월</div><div class="m-tab">8월</div>
+              </div>
+              <div class="m-range">2026-07-01~2026-07-31 기준</div>
+              <div class="stat-grid">
+                <div class="stat-card"><div class="stat-card__icon" style="background:var(--blue-soft); color:var(--blue-strong);">✉</div><div class="stat-card__label">총 문의</div><div class="stat-card__value">247건</div></div>
+                <div class="stat-card"><div class="stat-card__icon" style="background:var(--purple-soft); color:var(--purple);">▤</div><div class="stat-card__label">카테고리</div><div class="stat-card__value">18개</div></div>
+                <div class="stat-card"><div class="stat-card__icon" style="background:var(--teal-soft); color:var(--teal);">▥</div><div class="stat-card__label">문의 회사</div><div class="stat-card__value">42개</div></div>
+              </div>
+              <div class="action-banner">
+                <div class="action-banner__icon">!</div>
+                <div><div class="action-banner__title">AI 답변 불가 · 직접 답변 필요 5건</div><div class="action-banner__sub">비서실이 회장님 확인을 요청했습니다</div></div>
+                <span class="action-banner__arrow">›</span>
+              </div>
+              <div class="m-h3">키워드</div>
+              <div class="kw-box">
+                <span class="kw kw-xl kw-blue">AI 전략</span>
+                <span class="kw kw-l kw-blue">조직개편</span>
+                <span class="kw kw-l kw-purple">반도체</span>
+                <span class="kw kw-s kw-gray">사내문화</span>
+                <span class="kw kw-m kw-pink">급여체계</span>
+                <span class="kw kw-l kw-pink">성과평가</span>
+                <span class="kw kw-m kw-blue">구성원 역량</span>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">메인 대시보드 + 진입 배너 (신규)</div>
+        </div>
+
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">‹</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">AI 답변 불가</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="tagrow" style="margin-bottom:10px;"><span class="pill">총 5건</span><span class="pill">7월 기준</span></div>
+              <div class="status-tabs">
+                <div class="chip chip--active">전체 5</div>
+                <div class="chip">답변 대기 2</div>
+                <div class="chip">확인 중 2</div>
+                <div class="chip">완료 1</div>
+              </div>
+              <div class="list-toolbar"><span class="list-toolbar__count">전체 5건</span><span class="list-toolbar__sort">오래된 순 ⌄</span></div>
+
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--noai">AI 답변 불가</span><span class="cat-date">2026-07-20</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">연봉협상 시기가 앞당겨질 수 있나요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">서** · SK</span><span class="status-pill status-pill--done">답변 완료</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--noai">AI 답변 불가</span><span class="cat-date">2026-07-24</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">승진 심사 기준에 정량 지표 반영 비율이 있나요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">윤** · SK하이닉스</span><span class="status-pill status-pill--review">비서실 확인 중</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--noai">AI 답변 불가</span><span class="cat-date">2026-07-27</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">이번 조직개편에서 우리 팀 인원 규모는 어떻게 되나요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">한** · SK텔레콤</span><span class="status-pill status-pill--wait">회장님 답변 대기</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--noai">AI 답변 불가</span><span class="cat-date">2026-07-29</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">이번 하반기 성과급 지급률은 정확히 몇 %인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">정** · SK이노베이션 E&amp;S</span><span class="status-pill status-pill--wait">회장님 답변 대기</span></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">AI 답변 불가 전용 탭</div>
+        </div>
+      </div>
+      <ul class="notes">
+        <li><b>진입 배너는 5건이 0건이 되면 사라지는 것으로</b> 가정합니다 — 처리할 게 없을 때까지 항상 떠 있으면 무뎌지기 때문입니다.</li>
+        <li>상태 필터는 <b>전체 / 답변 대기 / 확인 중 / 완료</b> 4가지입니다 — 회장님 입장에서 "내가 지금 뭘 해야 하는지"가 가장 중요해서, 날짜순보다 상태 필터를 앞에 뒀습니다.</li>
+        <li><b>이 탭만 기본 정렬이 "오래된 순"입니다</b> — 다른 목록은 훑어보는 용도라 최신순이지만, 여긴 처리해야 할 대기열이라 성격이 다릅니다. 가장 오래 기다린 질문이 맨 위로 오고, 새 질문이 계속 쌓여도 오래된 건이 아래로 묻히지 않습니다. 미답변 대기열에서는 "최근 = 중요"가 아니라 <b>"오래됨 = 위험"</b>이기 때문입니다.</li>
+        <li>카드를 누르면 이전에 만든 "답변 작성" 상세 화면(§03)으로 이동합니다 — 이미 답변·확인이 끝난 항목("완료")도 눌러서 내용을 다시 볼 수 있습니다.</li>
+        <li>이 탭은 키워드별·회사별·Avatar별 보기(§01·§02)와 별개의 진입 경로입니다 — 같은 질문이 두 곳(예: "성과평가" 키워드 목록과 이 탭)에 동시에 나타날 수 있습니다.</li>
+      </ul>
+    </section>
+
+    <!-- STAT DRILLDOWN -->
+    <section class="block" id="stat-drilldown">
+      <div class="sec-head">
+        <span class="sec-num">05 · 신규</span>
+        <h2 class="sec-title">상단 통계 카드 클릭 — 전체 리스트 3종</h2>
+        <p class="sec-desc">"총 문의·카테고리·문의 회사" 세 카드는 지금까지 숫자만 보여주고 눌리지 않았습니다. 각각 눌렀을 때 열리는 화면을 추가합니다 — 문의는 <b>전체 문의를 훑는 리스트</b>로, 카테고리·회사는 <b>TOP5 너머 전체를 보는 목록</b>으로 이어집니다.</p>
+      </div>
+      <div class="mockrow" style="--n:3">
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">‹</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">전체 문의</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="tagrow" style="margin-bottom:10px;"><span class="pill">총 247건</span><span class="pill">7월 기준</span></div>
+              <div class="list-toolbar"><span class="list-toolbar__count">전체 247건</span><span class="list-toolbar__sort">최신순 ⌄</span></div>
+
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--noai">AI 답변 불가</span><span class="cat-date">2026-07-29</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">이번 하반기 성과급 지급률은 정확히 몇 %인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">정** · SK이노베이션 E&amp;S</span><span class="status-pill status-pill--wait">회장님 답변 대기</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--blue">AI 전략</span><span class="cat-date">2026-07-23</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">AI 시대에 우리 그룹이 반드시 확보해야 할 핵심 경쟁력은 무엇인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">김** · SK하이닉스</span><span class="status-pill">비서실로 전달</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--purple">반도체·지정학</span><span class="cat-date">2026-07-17</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">미국과 중국의 기술 경쟁이 SK하이닉스에 미치는 가장 큰 영향은 무엇인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">박** · SK하이닉스</span><span class="status-pill status-pill--done">비서실 전달 완료</span></div>
+              </div>
+              <div class="qa-card qa-card--tappable">
+                <span class="qa-tap-hint">›</span>
+                <div class="qa-top"><span class="cat-tag cat-tag--teal">사회 변화</span><span class="cat-date">2026-07-15</span></div>
+                <div class="qa-row"><span class="qa-icon qa-icon--q">Q</span><span class="qa-text qa-text--q">앞으로 우리 사업에 가장 큰 영향을 줄 사회 변화는 무엇인가요?</span></div>
+                <div class="qa-foot"><span class="qa-submitter">최** · SK</span><span class="status-pill">비서실로 전달</span></div>
+              </div>
+              <div class="dir-more">247건 중 4건 표시 · 스크롤하여 더보기</div>
+            </div>
+          </div></div>
+          <div class="device__label">"총 문의 247건" 클릭</div>
+        </div>
+
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">‹</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">카테고리</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="tagrow" style="margin-bottom:10px;"><span class="pill">총 18개</span><span class="pill">7월 기준</span></div>
+              <div class="list-toolbar"><span class="list-toolbar__count">전체 18개</span><span class="list-toolbar__sort">문의 많은순 ⌄</span></div>
+              <div class="dir-list">
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--pink);"></span><span class="dir-row__label">성과평가</span><span class="dir-row__count mono">48건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--blue);"></span><span class="dir-row__label">AI 전략</span><span class="dir-row__count mono">41건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--blue);"></span><span class="dir-row__label">구성원 역량</span><span class="dir-row__count mono">35건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--purple);"></span><span class="dir-row__label">반도체·지정학</span><span class="dir-row__count mono">28건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--ink-faint);"></span><span class="dir-row__label">승진기준</span><span class="dir-row__count mono">22건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--blue);"></span><span class="dir-row__label">조직개편</span><span class="dir-row__count mono">19건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--pink);"></span><span class="dir-row__label">급여체계</span><span class="dir-row__count mono">17건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--teal);"></span><span class="dir-row__label">사회 변화</span><span class="dir-row__count mono">14건</span><span class="dir-row__arrow">›</span></div>
+              </div>
+              <div class="dir-more">18개 중 8개 표시 · 스크롤하여 더보기</div>
+            </div>
+          </div></div>
+          <div class="device__label">"카테고리 18개" 클릭</div>
+        </div>
+
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen">
+            <div class="sheet__handle"></div>
+            <div class="sheet__head">
+              <div class="sheet__iconbtn">‹</div>
+              <div class="sheet__headmid"><div class="sheet__headtitle">문의 회사</div><div class="sheet__headsub">TM Avatar</div></div>
+              <div class="sheet__iconbtn">⋯</div>
+            </div>
+            <div class="sheet__body">
+              <div class="tagrow" style="margin-bottom:10px;"><span class="pill">총 42개</span><span class="pill">7월 기준</span></div>
+              <div class="list-toolbar"><span class="list-toolbar__count">전체 42개</span><span class="list-toolbar__sort">문의 많은순 ⌄</span></div>
+              <div class="dir-list">
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--pink);"></span><span class="dir-row__label">SK하이닉스</span><span class="dir-row__count mono">32건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--purple);"></span><span class="dir-row__label">SK텔레콤</span><span class="dir-row__count mono">27건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--purple);"></span><span class="dir-row__label">SK이노베이션 E&amp;S</span><span class="dir-row__count mono">24건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--pink);"></span><span class="dir-row__label">SK에코엔지니어링</span><span class="dir-row__count mono">19건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--ink-faint);"></span><span class="dir-row__label">SK</span><span class="dir-row__count mono">15건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--blue);"></span><span class="dir-row__label">SK스퀘어</span><span class="dir-row__count mono">12건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--teal);"></span><span class="dir-row__label">SK엔무브</span><span class="dir-row__count mono">9건</span><span class="dir-row__arrow">›</span></div>
+                <div class="dir-row"><span class="dir-row__dot" style="background:var(--ink-faint);"></span><span class="dir-row__label">SKC</span><span class="dir-row__count mono">7건</span><span class="dir-row__arrow">›</span></div>
+              </div>
+              <div class="dir-more">42개 중 8개 표시 · 스크롤하여 더보기</div>
+            </div>
+          </div></div>
+          <div class="device__label">"문의 회사 42개" 클릭</div>
+        </div>
+      </div>
+      <ul class="notes">
+        <li><b>"총 문의" 리스트는 카테고리·회사·전달상태가 섞인 전체 목록</b>입니다 — 필터 없이 최신순으로 훑어보는 용도라, §04의 "AI 답변 불가" 항목도 여기엔 섞여서 나옵니다.</li>
+        <li><b>카테고리·회사 리스트는 질문이 아니라 "목록의 목록"</b>입니다 — 행을 누르면 그 카테고리/회사로 필터링된 §01의 "키워드별로 보기"·"회사별로 보기" 화면으로 이어집니다.</li>
+        <li>정렬 기준은 카테고리·회사 리스트 모두 기본값을 "문의 많은순"으로 뒀습니다 — 대시보드의 TOP5가 이미 이 순서라 일관성을 맞췄습니다. 이름순 정렬이 별도로 필요한지는 확인이 필요합니다.</li>
+      </ul>
+    </section>
+
+    <!-- TRENDING -->
+    <section class="block" id="trending">
+      <div class="sec-head">
+        <span class="sec-num">06 · 신규</span>
+        <h2 class="sec-title">급상승 키워드 — 전월 대비 증가</h2>
+        <p class="sec-desc">기존 "가장 많이 언급된 키워드 TOP5"는 <b>총량</b>만 보여줍니다. 성과평가가 매달 1위인 것은 정보가 아니지만, 조직개편이 3건에서 19건으로 뛴 것은 신호입니다. 총량과 변화량은 서로 다른 질문에 답하므로, 기존 TOP5를 바꾸지 않고 <b>바로 아래에 별도 카드</b>로 붙였습니다.</p>
+      </div>
+      <div class="mockrow" style="--n:2">
+        <div class="device">
+          <div class="sheet"><div class="sheet__screen" style="height:420px;">
+            <div class="sheet__body" style="padding-top:16px;">
+              <div class="m-h3">가장 많이 언급된 키워드 <span class="top5-badge">TOP 5</span></div>
+              <div class="rank-list">
+                <div class="rank-row"><span class="rank-num">1</span><span class="rank-label">성과평가</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:92%"></span></span><span class="rank-count mono">48건</span></div>
+                <div class="rank-row"><span class="rank-num">2</span><span class="rank-label">AI 전략</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:78%"></span></span><span class="rank-count mono">41건</span></div>
+                <div class="rank-row"><span class="rank-num">3</span><span class="rank-label">구성원 역량</span><span class="rank-bar-track"><span class="rank-bar-fill" style="width:67%"></span></span><span class="rank-count mono">35건</span></div>
+              </div>
+              <div class="m-h3">급상승 키워드 <span class="top5-badge" style="background:var(--pink-soft); color:var(--pink);">전월 대비</span></div>
+              <div class="rank-list">
+                <div class="trend-row">
+                  <span class="trend-row__num">1</span>
+                  <span class="trend-row__main"><span class="trend-row__kw">조직개편</span><span class="trend-row__sub">6월 3건 → 7월 19건</span></span>
+                  <span class="trend-chip">▲ 16건</span>
+                </div>
+                <div class="trend-row">
+                  <span class="trend-row__num">2</span>
+                  <span class="trend-row__main"><span class="trend-row__kw">급여체계</span><span class="trend-row__sub">6월 6건 → 7월 17건</span></span>
+                  <span class="trend-chip">▲ 11건</span>
+                </div>
+                <div class="trend-row">
+                  <span class="trend-row__num">3</span>
+                  <span class="trend-row__main"><span class="trend-row__kw">보안 가이드라인</span><span class="trend-row__sub">6월 문의 없음 → 7월 9건</span></span>
+                  <span class="trend-chip trend-chip--new">NEW 9건</span>
+                </div>
+              </div>
+            </div>
+          </div></div>
+          <div class="device__label">총량 TOP5 바로 아래에 배치</div>
+        </div>
+        <div>
+          <div class="callout callout--new" style="margin-top:0;">
+            <strong>왜 %가 아니라 건수인가</strong> — 이 데이터는 월 수십 건 규모라 백분율이 오히려 왜곡을 만듭니다. 2건에서 6건으로 늘면 <b>+200%</b>지만 실제로는 4건 늘어난 것뿐이고, 48건에서 60건으로 늘면 <b>+25%</b>지만 12건이 늘어난 훨씬 큰 변화입니다. 백분율로 정렬하면 표본이 작은 키워드가 항상 상위를 차지해 목록이 무의미해집니다. 그래서 <b>증가 건수(절대값) 기준</b>으로 정렬하고, 실제 수치는 "6월 3건 → 7월 19건"으로 그대로 노출합니다.
+          </div>
+          <div class="callout" style="margin-bottom:0;">
+            <strong>신규 키워드는 NEW로 구분</strong> — 지난달 0건이던 키워드는 증가율을 계산할 수 없습니다(분모가 0). 무한대나 이상한 숫자를 띄우는 대신 <b>NEW 배지 + 이번 달 건수</b>로 표시합니다. 처음 등장한 화제라는 사실 자체가 회장님께는 가장 강한 신호이기도 합니다.
+          </div>
+        </div>
+      </div>
+      <ul class="notes">
+        <li><b>3건만 보여줍니다</b> — TOP5와 같은 길이로 만들면 대시보드가 순위표 두 개로 무거워지고, 4~5위쯤 가면 "2건 늘었음" 수준이라 신호가 아닙니다.</li>
+        <li><b>하락 키워드는 넣지 않았습니다</b> — 회장님이 취할 행동이 없습니다. 관심이 식은 주제는 그냥 목록에서 내려가면 충분합니다.</li>
+        <li>급상승 키워드를 누르면 총량 TOP5와 동일하게 <b>키워드별로 보기</b> 화면으로 이동합니다 — 별도 화면을 만들지 않습니다.</li>
+        <li><b>월 탭을 바꾸면 비교 기준도 함께 이동</b>합니다(6월 탭 선택 시 "5월 대비"). 첫 달처럼 비교할 이전 달이 없으면 이 카드는 노출하지 않습니다.</li>
+        <li>"급상승"의 판정 기준(최소 증가 건수 몇 건부터 노출할지, 동률 시 정렬 규칙)은 실제 데이터 분포를 보고 정하는 게 맞아 열어둡니다.</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer class="doc-foot">
+    <div class="wrap">TM Avatar — 구성원의 VOICE 미니앱 · v1.6 · 내부 검토용</div>
+  </footer>
+</div>
+</body>
+</html>
