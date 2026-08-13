@@ -150,6 +150,12 @@
     <p>클로드로 만든 목업 페이지들을 한곳에 모아둔 인덱스입니다. 카드를 클릭하면 각 페이지로 이동합니다.</p>
   </header>
 
+  <div id="groups"></div>
+
+  <footer id="footer-count">
+    각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다
+  </footer>
+
   <!-- ============================================
        ▼ 새 항목 추가는 여기 배열만 수정하면 됩니다.
        group: "scenario" | "app" | "print"
@@ -226,14 +232,7 @@
 
       container.appendChild(section);
     });
-  </script>
 
-  <div id="groups"></div>
-
-  <footer id="footer-count">
-    각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다
-  </footer>
-  <script>
     document.getElementById("footer-count").textContent =
       `총 ${items.length}개 페이지 · 각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다`;
   </script>
