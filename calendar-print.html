@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일정 관리 — 달력 프린트 화면 (월간·주간)</title>
+<style>
+  :root{
+    --bg:#F4F5F7; --card:#FFFFFF;
+    --ink:#16181D; --ink-soft:#5F6672; --ink-faint:#98A0AC;
+    --line:#E3E6EA; --line-soft:#EFF1F4;
+    --accent:#1F5C4A; --accent-soft:#E4EFEA;
+    --warn:#B03A2E; --warn-soft:#FBEBE9;
+    --shadow: 0 1px 2px rgba(22,24,29,.04), 0 12px 30px -16px rgba(22,24,29,.18);
+  }
+  /* Dark mode intentionally disabled — this document always renders light. */
+  :root[data-theme="dark"], :root[data-theme="light"]{
+    --bg:#F4F5F7; --card:#FFFFFF;
+    --ink:#16181D; --ink-soft:#5F6672; --ink-faint:#98A0AC;
+    --line:#E3E6EA; --line-soft:#EFF1F4;
+    --accent:#1F5C4A; --accent-soft:#E4EFEA;
+    --warn:#B03A2E; --warn-soft:#FBEBE9;
+    --shadow: 0 1px 2px rgba(22,24,29,.04), 0 12px 30px -16px rgba(22,24,29,.18);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .doc{ background:var(--bg); color:var(--ink); font-family:'Apple SD Gothic Neo','Pretendard','Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif; line-height:1.6; }
+  .mono{ font-family:'SF Mono','Noto Sans Mono CJK KR',ui-monospace,monospace; font-variant-numeric:tabular-nums; }
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 24px; }
+  a{ color:var(--accent); }
+
+  .hero{ padding:44px 0 30px; border-bottom:1px solid var(--line); }
+  .eyebrow{ display:inline-flex; align-items:center; gap:.5em; font-family:'SF Mono',ui-monospace,monospace; font-size:.7rem; letter-spacing:.13em; text-transform:uppercase; color:var(--accent); margin-bottom:13px; }
+  .eyebrow::before{ content:""; width:20px; height:1px; background:var(--accent); }
+  h1.title{ font-size:clamp(1.55rem,3.2vw,2.05rem); margin:0 0 11px; font-weight:800; letter-spacing:-.01em; }
+  .lede{ max-width:66ch; color:var(--ink-soft); font-size:.97rem; margin:0 0 16px; }
+  .metarow{ display:flex; flex-wrap:wrap; gap:8px 20px; font-size:.8rem; color:var(--ink-soft); }
+  .metarow b{ color:var(--ink); font-weight:700; }
+
+  section.block{ padding:42px 0; border-bottom:1px solid var(--line); }
+  section.block:last-of-type{ border-bottom:none; }
+  .sec-num{ font-family:'SF Mono',ui-monospace,monospace; font-size:.71rem; color:var(--accent); letter-spacing:.07em; display:block; margin-bottom:7px; }
+  h2.sec-title{ font-size:1.36rem; margin:0 0 9px; font-weight:800; letter-spacing:-.01em; }
+  .sec-desc{ color:var(--ink-soft); font-size:.92rem; max-width:74ch; margin:0 0 22px; }
+
+  .rules{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px; }
+  .rule{ background:var(--card); border:1px solid var(--line); border-radius:12px; padding:15px 16px; }
+  .rule__n{ font-family:'SF Mono',ui-monospace,monospace; font-size:.66rem; color:var(--accent); margin-bottom:7px; }
+  .rule__t{ font-size:.88rem; font-weight:800; margin-bottom:5px; }
+  .rule__d{ font-size:.81rem; color:var(--ink-soft); line-height:1.62; }
+
+  .callout{ background:var(--accent-soft); border:1px solid color-mix(in srgb, var(--accent) 26%, transparent); border-radius:12px; padding:15px 17px; font-size:.86rem; margin-top:20px; }
+  .callout strong{ color:var(--accent); }
+  .callout--ask{ background:var(--warn-soft); border-color:color-mix(in srgb, var(--warn) 28%, transparent); }
+  .callout--ask strong{ color:var(--warn); }
+
+  pre.code{ background:#15181D; color:#DDE3EA; border-radius:12px; padding:17px 19px; overflow-x:auto; font-family:'SF Mono',ui-monospace,monospace; font-size:.74rem; line-height:1.75; margin:0; }
+  pre.code .c{ color:#7E8B99; }
+  pre.code .k{ color:#8FD3A8; }
+
+  .preview-shell{ overflow-x:auto; padding:22px; background:var(--bg); border:1px solid var(--line); border-radius:14px; }
+  .paper-label{ font-size:.76rem; color:var(--ink-soft); margin-bottom:10px; display:flex; gap:10px; align-items:baseline; }
+  .paper-label b{ color:var(--ink); }
+
+  /* ============================================================
+     PRINT SHEET — A4 가로. 실제 mm 단위라 이 문서를 그대로 인쇄해도 1:1로 나옵니다.
+     ============================================================ */
+  .sheet{
+    width:297mm; min-height:210mm; background:#fff; margin:0 auto;
+    padding:10mm; box-shadow:var(--shadow); color:#000;
+    font-family:'Apple SD Gothic Neo','Pretendard','Noto Sans KR',sans-serif;
+  }
+  .sheet__head{ display:flex; align-items:flex-end; justify-content:space-between; gap:16px; padding-bottom:3mm; border-bottom:1.2pt solid #000; margin-bottom:3.5mm; }
+  .sheet__title{ font-size:13pt; font-weight:800; letter-spacing:-.01em; }
+  .sheet__sub{ font-size:7.5pt; color:#5F6672; margin-top:1mm; }
+  .sheet__meta{ font-size:7.5pt; color:#5F6672; text-align:right; line-height:1.7; font-variant-numeric:tabular-nums; }
+
+  table.cal{ width:100%; border-collapse:collapse; table-layout:fixed; }
+  table.cal th{
+    font-size:7.5pt; font-weight:700; padding:1.6mm 0; text-align:center;
+    border:0.5pt solid #B9BEC6; background:#F2F3F5; color:#16181D;
+  }
+  table.cal th.sat{ color:#2B5FA8; }
+  table.cal th.sun{ color:#B03A2E; }
+  table.cal td{
+    border:0.5pt solid #B9BEC6; vertical-align:top;
+    padding:1.4mm 1.4mm 1.8mm; height:auto;           /* 고정 높이 없음 → 내용만큼 늘어남 */
+  }
+  table.cal td.out{ background:#FAFAFB; }
+  .daynum{ font-size:8pt; font-weight:800; font-variant-numeric:tabular-nums; margin-bottom:1.2mm; line-height:1; }
+  td.out .daynum{ color:#B4B9C1; font-weight:600; }
+  .daynum .sat{ color:#2B5FA8; } .daynum .sun{ color:#B03A2E; }
+  .daynum__cnt{ font-size:6.5pt; font-weight:600; color:#5F6672; margin-left:1.2mm; }
+
+  .evlist{ display:flex; flex-direction:column; gap:1.1mm; }
+  .ev{
+    display:flex; gap:1.4mm; align-items:flex-start;
+    font-size:7pt; line-height:1.42; color:#000;
+    /* 프린트 핵심 — 자르지 않고 줄바꿈 */
+    white-space:normal; overflow:visible; text-overflow:clip; word-break:keep-all;
+  }
+  .ev__t{ flex:0 0 8.5mm; font-variant-numeric:tabular-nums; font-weight:700; letter-spacing:-.02em; }
+  .ev__n{ flex:1 1 auto; min-width:0; }
+
+  footer.sheet__foot{ margin-top:3mm; padding-top:2mm; border-top:0.5pt solid #B9BEC6; display:flex; justify-content:space-between; font-size:6.5pt; color:#5F6672; }
+
+  /* ---------- WEEKLY sheet ---------- */
+  .wk{ --axis:13mm; --hour:28mm; --col:calc((100% - var(--axis)) / 7); }
+  .wk-head{ display:flex; }
+  .wk-head__spacer{ width:var(--axis); flex:0 0 auto; border-right:0.5pt solid #B9BEC6; }
+  .wk-head__c{ flex:1 1 0; min-width:0; text-align:center; padding:1.6mm 0 1.8mm;
+    border:0.5pt solid #B9BEC6; border-left:0; background:#F2F3F5; }
+  .wk-head__d{ font-size:7pt; font-weight:700; color:#16181D; }
+  .wk-head__n{ font-size:9pt; font-weight:800; margin-top:.4mm; font-variant-numeric:tabular-nums; }
+  .wk-head__c.sat .wk-head__d, .wk-head__c.sat .wk-head__n{ color:#2B5FA8; }
+  .wk-head__c.sun .wk-head__d, .wk-head__c.sun .wk-head__n{ color:#B03A2E; }
+
+  .wk-allday{ display:flex; align-items:stretch; }
+  .wk-allday__l{ width:var(--axis); flex:0 0 auto; font-size:6pt; color:#5F6672; text-align:right;
+    padding:1.4mm 1.4mm 0 0; border-right:0.5pt solid #B9BEC6; border-bottom:0.5pt solid #B9BEC6; }
+  .wk-allday__c{ flex:1 1 0; min-width:0; border:0.5pt solid #B9BEC6; border-left:0; border-top:0;
+    padding:1.2mm; min-height:7mm; }
+  .wk-allday__ev{ font-size:7pt; line-height:1.4; font-weight:700; word-break:keep-all; }
+
+  .wk-grid{ position:relative; display:flex; }
+  .wk-axis{ width:var(--axis); flex:0 0 auto; border-right:0.5pt solid #B9BEC6; }
+  .wk-axis__h{ height:var(--hour); position:relative; }
+  .wk-axis__h span{ position:absolute; top:-1.6mm; right:1.4mm; font-size:6pt; color:#5F6672;
+    font-variant-numeric:tabular-nums; background:#fff; padding-left:.6mm; }
+  .wk-cols{ flex:1 1 auto; display:flex; position:relative; }
+  .wk-col{ flex:1 1 0; min-width:0; position:relative; border-right:0.5pt solid #B9BEC6; }
+  .wk-col:first-child{ border-left:0.5pt solid #B9BEC6; }
+  .wk-col.weekend{ background:#FAFAFB; }
+  .wk-col__lines{ position:absolute; inset:0; }
+  .wk-col__lines i{ display:block; height:var(--hour); border-bottom:0.5pt solid #DDE0E4; }
+  .wk-col__lines i:last-child{ border-bottom:0.5pt solid #B9BEC6; }
+  .wk-ev{ position:absolute; left:.8mm; right:.8mm; height:auto; background:#fff;
+    border:0.5pt solid #8E959E; border-left:1.2pt solid #16181D; border-radius:.8mm;
+    padding:1mm 1.2mm; overflow:visible; }
+  .wk-ev__t{ font-size:6pt; color:#5F6672; font-variant-numeric:tabular-nums; line-height:1.25; }
+  .wk-ev__n{ font-size:7pt; font-weight:700; line-height:1.35; word-break:keep-all; margin-top:.3mm; }
+  .wk-ev__a{ font-size:6pt; color:#3F4650; line-height:1.32; margin-top:.6mm; word-break:keep-all; }
+  .wk-axis__end{ height:0; position:relative; }
+  .wk-axis__end span{ position:absolute; top:-1.6mm; right:1.4mm; font-size:6pt; color:#5F6672;
+    font-variant-numeric:tabular-nums; background:#fff; padding-left:.6mm; }
+
+  .doc-foot{ padding:28px 0 50px; color:var(--ink-soft); font-size:.79rem; }
+
+  /* ============================================================
+     실제 인쇄 시 적용 — 문서 설명 영역은 감추고 용지만 출력
+     ============================================================ */
+  @page{ size:A4 landscape; margin:10mm; }
+  @media print{
+    .no-print{ display:none !important; }
+    body{ background:#fff; }
+    .doc{ background:#fff; }
+    .preview-shell{ padding:0; border:0; background:#fff; overflow:visible; }
+    .sheet{ width:auto; min-height:0; margin:0; padding:0; box-shadow:none; }
+    table.cal thead{ display:table-header-group; }   /* 페이지 넘어가도 요일 헤더 반복 */
+    table.cal tr{ break-inside:avoid; page-break-inside:avoid; }
+    .ev{ break-inside:avoid; page-break-inside:avoid; }
+    /* 주간 — 시트 하나당 한 장 */
+    .sheet{ break-after:page; page-break-after:always; }
+    .sheet:last-of-type{ break-after:auto; page-break-after:auto; }
+  }
+
+  @media (max-width:920px){ .rules{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="wrap no-print">
+    <section class="hero">
+      <div class="eyebrow">Admin · 일정 Agent</div>
+      <h1 class="title">일정 관리 — 달력 프린트 화면</h1>
+      <p class="lede">"일정 화면 프린트" 버튼을 눌렀을 때 나오는 출력물입니다. 화면용 달력은 셀 높이가 고정이라 일정이 3건을 넘으면 <span class="mono">+N개 더보기</span>로 감추고 제목도 잘리는데, 인쇄물은 손에 들고 보는 것이라 감출 곳이 없습니다. <b>모든 일정을 자르지 않고 전부 노출</b>하는 것이 이 화면의 유일한 목적입니다.</p>
+      <div class="metarow">
+        <span><b>용지</b> A4 가로 (297×210mm) · 여백 10mm</span>
+        <span><b>기준 화면</b> 일정 관리 · 월간 / 주간</span>
+        <span><b>작성일</b> 2026-08-12</span>
+      </div>
+    </section>
+
+    <section class="block">
+      <span class="sec-num">01 · Print Rules</span>
+      <h2 class="sec-title">화면과 다르게 동작하는 5가지</h2>
+      <p class="sec-desc">아래는 프린트에서만 적용되는 규칙입니다. 화면용 달력의 동작은 그대로 두고, 인쇄 시점에만 무효화합니다.</p>
+      <div class="rules">
+        <div class="rule">
+          <div class="rule__n">RULE 01</div>
+          <div class="rule__t">셀 높이 고정 해제</div>
+          <div class="rule__d">행 높이를 내용에 맞춰 자동으로 늘립니다. 일정이 몰린 주는 행이 두꺼워지고, 한 건도 없는 주는 날짜 숫자만 들어갈 만큼 얇아집니다. 모든 행을 같은 높이로 맞추지 않습니다.</div>
+        </div>
+        <div class="rule">
+          <div class="rule__n">RULE 02</div>
+          <div class="rule__t">잘림·말줄임 없음</div>
+          <div class="rule__d">일정명이 길면 셀 안에서 줄바꿈합니다. <span class="mono">text-overflow: ellipsis</span>와 <span class="mono">nowrap</span>을 해제하고, 시각은 왼쪽에 고정한 채 제목만 흐릅니다. 한글은 <span class="mono">word-break: keep-all</span>로 단어 중간이 끊기지 않게 합니다.</div>
+        </div>
+        <div class="rule">
+          <div class="rule__n">RULE 03</div>
+          <div class="rule__t">"+N개 더보기" 제거</div>
+          <div class="rule__d">화면에서 3건까지만 보여주고 나머지를 접던 처리를 인쇄에서는 해제하고 전부 펼칩니다. 8월 10일의 <span class="mono">+1개 더보기</span>에 숨어 있던 네 번째 일정도 그대로 나옵니다.</div>
+        </div>
+        <div class="rule">
+          <div class="rule__n">RULE 04</div>
+          <div class="rule__t">지난 일정도 동일하게</div>
+          <div class="rule__d">화면에서 흐리게(회색) 또는 취소선으로 처리하던 지난 일정을 인쇄에서는 <b>다른 일정과 똑같은 농도</b>로 출력합니다. 종이는 기록용이라 지난 일정이 더 중요할 수 있고, 옅은 회색은 인쇄 품질에 따라 아예 안 찍힙니다.</div>
+        </div>
+        <div class="rule">
+          <div class="rule__n">RULE 05</div>
+          <div class="rule__t">취소된 일정은 제외</div>
+          <div class="rule__d">취소된 일정은 인쇄물에서 <b>아예 빼고 출력</b>합니다. 기호를 쓰지 않기로 한 이상 취소 건을 남겨두면 살아 있는 일정과 구분되지 않아, 종이만 보는 사람이 그대로 진행되는 일정으로 읽게 됩니다. <b>RULE 04와 구분됩니다</b> — 지나간 일정은 남기고, 취소된 일정만 뺍니다.</div>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>흑백 인쇄 기준 · 기호는 쓰지 않습니다</strong> — 화면의 색 점(● 검정 / ● 주황)과 붉은 텍스트는 흑백 출력에서 회색조로 뭉개져 구분되지 않고, 기호(⚠ · × 등)는 인쇄물에 툴팁이 없어 받는 사람이 해석할 수 없습니다. 그래서 인쇄물은 <b>시각과 일정명만</b> 남깁니다 — 모든 일정을 같은 격으로 나열하고, 색·기호로 상태를 구분하지 않습니다. 색상 프린터로 뽑아도 정보가 더 늘지 않습니다.
+      </div>
+    </section>
+
+    <section class="block">
+      <span class="sec-num">02 · Monthly</span>
+      <h2 class="sec-title">월간 프린트 미리보기</h2>
+      <p class="sec-desc">실제 A4 가로 용지 크기(297×210mm)로 그렸습니다. 이 문서를 그대로 인쇄하면 아래 용지만 1:1로 출력됩니다 — 설명 영역은 인쇄에서 자동으로 빠집니다.</p>
+    </section>
+  </div>
+
+  <div class="wrap no-print" style="padding-bottom:42px;">
+    <div class="paper-label"><b>A4 가로</b> <span>297 × 210mm · 여백 10mm · 1페이지</span></div>
+  </div>
+
+  <div class="wrap"><div class="preview-shell">
+    <div class="sheet">
+      <div class="sheet__head">
+        <div>
+          <div class="sheet__title">일정 관리 · 2026년 8월</div>
+          <div class="sheet__sub">TM Agent Admin · 비서실 운영 관리</div>
+        </div>
+        <div class="sheet__meta">
+          출력일시 2026-08-11 09:40<br/>
+          총 48건 · 취소 3건 제외<br/>
+          8월 1일~31일
+        </div>
+      </div>
+
+      <table class="cal">
+        <thead>
+          <tr>
+            <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th class="sat">토</th><th class="sun">일</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="out">
+              <div class="daynum">27</div>
+            </td>
+            <td class="out">
+              <div class="daynum">28</div>
+            </td>
+            <td class="out">
+              <div class="daynum">29</div>
+            </td>
+            <td class="out">
+              <div class="daynum">30</div>
+            </td>
+            <td class="out">
+              <div class="daynum">31</div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sat">1</span></div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sun">2</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="daynum">3</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">그룹 임원 조회</span></div>
+                <div class="ev"><span class="ev__t">11:00</span><span class="ev__n">계열사 실적 취합 회의</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">4</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">IR 자료 검토</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">5</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">협력사 계약 검토</span></div>
+                <div class="ev"><span class="ev__t">16:00</span><span class="ev__n">법무 리스크 점검</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">6</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">10:00</span><span class="ev__n">사업개발 주간회의</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">7</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">10:00</span><span class="ev__n">분기 실적 보고</span></div>
+                <div class="ev"><span class="ev__t">15:00</span><span class="ev__n">대외협력 정례</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sat">8</span></div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sun">9</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="daynum">10</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">임원 조찬 미팅</span></div>
+                <div class="ev"><span class="ev__t">10:30</span><span class="ev__n">그룹 전략회의</span></div>
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">신규 사업 보고</span></div>
+                <div class="ev"><span class="ev__t">16:00</span><span class="ev__n">부문별 실적 점검</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">11</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:30</span><span class="ev__n">협력사 미팅</span></div>
+                <div class="ev"><span class="ev__t">13:00</span><span class="ev__n">인사 관련 독대</span></div>
+                <div class="ev"><span class="ev__t">16:00</span><span class="ev__n">Global FLP 써머인턴 발표회</span></div>
+                <div class="ev"><span class="ev__t">18:30</span><span class="ev__n">Global FLP 써머인턴 만찬</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">12<span class="daynum__cnt">10건</span></div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">08:00</span><span class="ev__n">조찬 간담회</span></div>
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">일일 현안 점검</span></div>
+                <div class="ev"><span class="ev__t">10:00</span><span class="ev__n">CSES 정기 이사회</span></div>
+                <div class="ev"><span class="ev__t">11:00</span><span class="ev__n">타운홀 준비</span></div>
+                <div class="ev"><span class="ev__t">13:00</span><span class="ev__n">신자본주의 정책 제안 관련 미팅</span></div>
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">T Map 보고</span></div>
+                <div class="ev"><span class="ev__t">15:00</span><span class="ev__n">AI DC 러닝세션 (SKB)</span></div>
+                <div class="ev"><span class="ev__t">16:00</span><span class="ev__n">반도체 사업 현황 보고</span></div>
+                <div class="ev"><span class="ev__t">17:00</span><span class="ev__n">사외이사 사전 브리핑</span></div>
+                <div class="ev"><span class="ev__t">18:30</span><span class="ev__n">협력사 대표 만찬</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">13</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">해외 파트너 화상회의</span></div>
+                <div class="ev"><span class="ev__t">13:00</span><span class="ev__n">대한상의 정기보고</span></div>
+                <div class="ev"><span class="ev__t">15:00</span><span class="ev__n">M&amp;A 검토 보고</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">14</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">10:00</span><span class="ev__n">주간 임원 회의</span></div>
+                <div class="ev"><span class="ev__t">13:00</span><span class="ev__n">빅테크 컨설팅</span></div>
+                <div class="ev"><span class="ev__t">16:00</span><span class="ev__n">AI Agent 시연</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sat">15</span></div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">종일</span><span class="ev__n">회장님 수도권 신공장 부지 현장 점검</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sun">16</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="daynum">17</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">주간 업무 보고</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">18</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">15:00</span><span class="ev__n">ESG 위원회</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">19</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">10:00</span><span class="ev__n">노사협의회</span></div>
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">사업장 안전 점검 보고</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">20</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">11:00</span><span class="ev__n">자회사 CEO 면담</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">21</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">13:00</span><span class="ev__n">임원 워크숍</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sat">22</span></div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sun">23</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="daynum">24</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">주간 업무 보고</span></div>
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">하반기 투자 계획 검토</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">25</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">하반기 조직개편 보고</span></div>
+                <div class="ev"><span class="ev__t">15:00</span><span class="ev__n">인재 채용 전략 회의</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">26</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">10:00</span><span class="ev__n">디지털 전환 추진 현황</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">27</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">대외 기관 방문</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum">28</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">15:00</span><span class="ev__n">그룹사 CEO 간담회</span></div>
+              </div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sat">29</span></div>
+            </td>
+            <td>
+              <div class="daynum"><span class="sun">30</span></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="daynum">31</div>
+              <div class="evlist">
+                <div class="ev"><span class="ev__t">09:00</span><span class="ev__n">월간 경영 리뷰</span></div>
+                <div class="ev"><span class="ev__t">14:00</span><span class="ev__n">9월 일정 사전 조율</span></div>
+              </div>
+            </td>
+            <td class="out">
+              <div class="daynum">1</div>
+            </td>
+            <td class="out">
+              <div class="daynum">2</div>
+            </td>
+            <td class="out">
+              <div class="daynum">3</div>
+            </td>
+            <td class="out">
+              <div class="daynum">4</div>
+            </td>
+            <td class="out">
+              <div class="daynum">5</div>
+            </td>
+            <td class="out">
+              <div class="daynum">6</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <footer class="sheet__foot">
+        <span>TM Agent Admin · 일정 관리</span>
+        <span>2026년 8월 · 1 / 1</span>
+      </footer>
+    </div>
+  </div></div>
+
+  <div class="wrap no-print">
+    <section class="block" style="border-top:1px solid var(--line); margin-top:42px; padding-bottom:14px;">
+      <span class="sec-num">03 · Weekly</span>
+      <h2 class="sec-title">주간 프린트 — 시간 그리드</h2>
+      <p class="sec-desc">주간은 월간과 문제가 다릅니다. 월간은 "며칠에 무엇이 있는지"를 보지만, 주간은 <b>일정의 길이와 간격</b>을 보려고 씁니다. 그래서 시간 그리드를 없애면 주간 뷰를 인쇄할 이유 자체가 사라집니다. 그리드는 유지하되, 짧은 일정의 제목이 잘리지 않도록 아래 3가지를 추가로 적용했습니다.</p>
+      <div class="rules" style="margin-bottom:20px;">
+        <div class="rule">
+          <div class="rule__n">RULE 06</div>
+          <div class="rule__t">1시간 칸을 넉넉하게</div>
+          <div class="rule__d">1시간 = <b>28mm</b>로 잡았습니다. 30분짜리 일정도 14mm를 확보해 <b>시각·일정명(2줄)·참석자</b>가 모두 칸 안에 들어갑니다. 화면 밀도 그대로 가면 짧은 일정이 곧바로 잘립니다.</div>
+        </div>
+        <div class="rule">
+          <div class="rule__n">RULE 07</div>
+          <div class="rule__t">칸이 내용만큼 늘어남</div>
+          <div class="rule__d">일정 박스 높이는 <b>고정이 아니라 최소값</b>입니다(<span class="mono">min-height</span>). 제목·참석자가 길면 박스가 아래로 늘어나 <b>글자가 박스 밖으로 나가지 않습니다</b>. 월간의 행 확장과 같은 원리입니다.</div>
+        </div>
+        <div class="rule">
+          <div class="rule__n">RULE 08</div>
+          <div class="rule__t">시간대로 나눠 여러 장에</div>
+          <div class="rule__d">칸을 키운 만큼 하루가 한 장에 안 들어갑니다. 시간 그리드는 페이지 경계에서 박스가 잘리므로 <b>브라우저 자동 분할에 맡기지 않고 시간대로 끊어</b> 장을 나눕니다 — 08:00~13:00 / 13:00~18:00. 각 장에 요일 헤더를 반복합니다.</div>
+        </div>
+      </div>
+      <div class="paper-label"><b>A4 가로 2장</b> <span>297 × 210mm · 여백 10mm · 08:00~13:00 / 13:00~18:00</span></div>
+    </section>
+  </div>
+
+  <div class="wrap"><div class="preview-shell">
+    <div class="sheet">
+      <div class="sheet__head">
+        <div>
+          <div class="sheet__title">일정 관리 · 2026년 8월 2주차</div>
+          <div class="sheet__sub">TM Agent Admin · 비서실 운영 관리 · 08:00~13:00</div>
+        </div>
+        <div class="sheet__meta">
+          2026-08-10 ~ 2026-08-16 · 총 10건 (취소 2건 제외)<br/>
+          출력일시 2026-08-12 17:40
+        </div>
+      </div>
+
+      <div class="wk">
+        <div class="wk-head">
+          <div class="wk-head__spacer"></div>
+          <div class="wk-head__c"><div class="wk-head__d">월</div><div class="wk-head__n">10</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">화</div><div class="wk-head__n">11</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">수</div><div class="wk-head__n">12</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">목</div><div class="wk-head__n">13</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">금</div><div class="wk-head__n">14</div></div>
+          <div class="wk-head__c sat"><div class="wk-head__d">토</div><div class="wk-head__n">15</div></div>
+          <div class="wk-head__c sun"><div class="wk-head__d">일</div><div class="wk-head__n">16</div></div>
+        </div>
+
+        <div class="wk-allday">
+          <div class="wk-allday__l">종일</div>
+          <div class="wk-allday__c"></div>
+          <div class="wk-allday__c"></div>
+          <div class="wk-allday__c"></div>
+          <div class="wk-allday__c"></div>
+          <div class="wk-allday__c"></div>
+          <div class="wk-allday__c"><div class="wk-allday__ev">회장님 수도권 신공장 부지 현장 점검 및 협력사 방문 일정</div><div class="wk-ev__a">수행 3인</div></div>
+          <div class="wk-allday__c"></div>
+        </div>
+
+        <div class="wk-grid">
+          <div class="wk-axis">
+            <div class="wk-axis__h"><span>08:00</span></div>
+            <div class="wk-axis__h"><span>09:00</span></div>
+            <div class="wk-axis__h"><span>10:00</span></div>
+            <div class="wk-axis__h"><span>11:00</span></div>
+            <div class="wk-axis__h"><span>12:00</span></div>
+            <div class="wk-axis__end"><span>13:00</span></div>
+          </div>
+          <div class="wk-cols">
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="wk-ev" style="top:calc(1 * var(--hour)); min-height:calc(1 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">09:00 – 10:00</div><div class="wk-ev__n">임원 조찬 미팅</div><div class="wk-ev__a">김OO 부사장 외 4인</div>
+              </div>
+              <div class="wk-ev" style="top:calc(2.5 * var(--hour)); min-height:calc(1 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">10:30 – 11:30</div><div class="wk-ev__n">그룹 전략회의</div><div class="wk-ev__a">전략기획팀장 외 6인</div>
+              </div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="wk-ev" style="top:calc(1.5 * var(--hour)); min-height:calc(1 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">09:30 – 10:30</div><div class="wk-ev__n">협력사 미팅</div><div class="wk-ev__a">한빛테크놀로지스 김민준 CEO 외 2인</div>
+              </div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="wk-ev" style="top:calc(1.5 * var(--hour)); min-height:calc(0.5 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">09:30 – 10:00</div><div class="wk-ev__n">조간 스탠드업 및 현안 공유</div><div class="wk-ev__a">비서실 전원</div>
+              </div>
+              <div class="wk-ev" style="top:calc(3 * var(--hour)); min-height:calc(1 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">11:00 – 12:00</div><div class="wk-ev__n">타운홀 준비</div><div class="wk-ev__a">홍보팀 5인</div>
+              </div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="wk-ev" style="top:calc(1 * var(--hour)); min-height:calc(1 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">09:00 – 10:00</div><div class="wk-ev__n">해외 파트너 화상회의</div><div class="wk-ev__a">NVIDIA 젠슨 황 외 2인</div>
+              </div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="wk-ev" style="top:calc(2 * var(--hour)); min-height:calc(1 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">10:00 – 11:00</div><div class="wk-ev__n">주간 임원 회의</div><div class="wk-ev__a">임원 12인</div>
+              </div>
+            </div>
+            <div class="wk-col weekend">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="wk-col weekend">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="sheet__foot">
+        <span>TM Agent Admin · 일정 관리</span>
+        <span>2026년 8월 2주차 · 1 / 2</span>
+      </footer>
+    </div>
+    <div style="height:26px;"></div>
+    <div class="sheet">
+      <div class="sheet__head">
+        <div>
+          <div class="sheet__title">일정 관리 · 2026년 8월 2주차</div>
+          <div class="sheet__sub">TM Agent Admin · 비서실 운영 관리 · 13:00~18:00</div>
+        </div>
+        <div class="sheet__meta">
+          2026-08-10 ~ 2026-08-16 · 총 10건 (취소 2건 제외)<br/>
+          출력일시 2026-08-12 17:40
+        </div>
+      </div>
+
+      <div class="wk">
+        <div class="wk-head">
+          <div class="wk-head__spacer"></div>
+          <div class="wk-head__c"><div class="wk-head__d">월</div><div class="wk-head__n">10</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">화</div><div class="wk-head__n">11</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">수</div><div class="wk-head__n">12</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">목</div><div class="wk-head__n">13</div></div>
+          <div class="wk-head__c"><div class="wk-head__d">금</div><div class="wk-head__n">14</div></div>
+          <div class="wk-head__c sat"><div class="wk-head__d">토</div><div class="wk-head__n">15</div></div>
+          <div class="wk-head__c sun"><div class="wk-head__d">일</div><div class="wk-head__n">16</div></div>
+        </div>
+
+        <div class="wk-grid">
+          <div class="wk-axis">
+            <div class="wk-axis__h"><span>13:00</span></div>
+            <div class="wk-axis__h"><span>14:00</span></div>
+            <div class="wk-axis__h"><span>15:00</span></div>
+            <div class="wk-axis__h"><span>16:00</span></div>
+            <div class="wk-axis__h"><span>17:00</span></div>
+            <div class="wk-axis__end"><span>18:00</span></div>
+          </div>
+          <div class="wk-cols">
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+              <div class="wk-ev" style="top:calc(1 * var(--hour)); min-height:calc(1 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">14:00 – 15:00</div><div class="wk-ev__n">신규 사업 보고</div><div class="wk-ev__a">신사업추진단 3인</div>
+              </div>
+              <div class="wk-ev" style="top:calc(3 * var(--hour)); min-height:calc(1.5 * var(--hour) - 1mm);">
+                <div class="wk-ev__t">16:00 – 17:30</div><div class="wk-ev__n">이사회 사전 브리핑</div><div class="wk-ev__a">사외이사 4인</div>
+              </div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="wk-col">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="wk-col weekend">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="wk-col weekend">
+              <div class="wk-col__lines"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="sheet__foot">
+        <span>TM Agent Admin · 일정 관리</span>
+        <span>2026년 8월 2주차 · 2 / 2</span>
+      </footer>
+    </div>
+  </div></div>
+
+  <div class="wrap no-print">
+    <section class="block" style="padding-top:34px;">
+      <div class="callout">
+        <strong>주간에서도 월간과 같은 규칙이 그대로 적용됩니다</strong> — 지나간 일정(8/10 오전 2건)은 흐리게 처리하지 않고 같은 농도로, 취소된 일정(8/11 인사 관련 독대, 8/13 M&amp;A 검토 보고)은 <b>아예 빼고</b> 출력합니다. 화면의 색 점·자물쇠·× 기호도 모두 제거했습니다. 현재 시각을 나타내던 빨간 선은 종이에서 의미가 없어 지웠습니다 — 출력 시각은 상단에 있습니다.
+      </div>
+      <div class="callout callout--ask" style="margin-bottom:0;">
+        <strong>확인 필요 — 같은 시간대에 일정이 겹칠 때</strong> 이번 주 데이터에는 시간이 겹치는 일정이 없어 한 칸에 하나씩 들어갔습니다. 실제로 겹치는 경우 화면에서는 칸을 좌우로 나눠 표시하는데, 인쇄에서 <b>폭을 반으로 나누면 제목이 다시 잘립니다</b>(37mm → 18mm). 세 가지 중 하나를 정해야 합니다: <b>①</b> 화면처럼 좌우 분할(제목 잘림 감수) <b>②</b> 위아래로 밀어서 순서대로 배치(시간 위치가 실제와 어긋남) <b>③</b> 겹치는 날만 해당 칸을 넓히고 다른 요일을 좁힘. 겹침이 얼마나 자주 생기는지에 따라 답이 달라집니다.
+      </div>
+    </section>
+  </div>
+
+  <div class="wrap no-print">
+    <section class="block" style="border-top:1px solid var(--line);">
+      <span class="sec-num">04 · Implementation</span>
+      <h2 class="sec-title">적용 CSS</h2>
+      <p class="sec-desc">화면용 마크업을 그대로 두고 프린트 스타일만 덧씌우는 방식입니다. 달력을 <span class="mono">div</span> 그리드가 아니라 <span class="mono">table</span>로 만들어 두면 행 높이 자동 확장과 페이지 넘김 처리가 브라우저 기본 동작으로 해결됩니다.</p>
+      <pre class="code"><span class="c">/* 용지 — A4 가로 고정 */</span>
+<span class="k">@page</span> { size: A4 landscape; margin: 10mm; }
+
+<span class="k">@media print</span> {
+  <span class="c">/* 사이드바·툴바·주간월간 토글 등 화면 전용 UI 제거 */</span>
+  .app-sidebar, .app-toolbar, .view-toggle, .btn-group { display: none !important; }
+
+  <span class="c">/* RULE 01 — 셀 높이 고정 해제, 내용만큼 늘어나게 */</span>
+  .cal td { height: auto !important; min-height: 0 !important; vertical-align: top; }
+
+  <span class="c">/* RULE 02 — 자르지 않고 줄바꿈 */</span>
+  .cal .ev {
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    word-break: keep-all;          <span class="c">/* 한글 단어 중간 끊김 방지 */</span>
+  }
+
+  <span class="c">/* RULE 03 — 접힘 해제 */</span>
+  .cal .ev--hidden { display: flex !important; }
+  .cal .more-link { display: none !important; }
+
+  <span class="c">/* RULE 04 — 지난 일정도 동일 농도 */</span>
+  .cal .is-past, .cal .is-past * {
+    opacity: 1 !important;
+    color: #000 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+  }
+
+  <span class="c">/* RULE 05 — 취소된 일정은 인쇄에서 제외 */</span>
+  .cal .ev--cancelled { display: none !important; }
+
+  <span class="c">/* 페이지 넘김 — 요일 헤더 반복, 주 단위로 쪼개지지 않게 */</span>
+  .cal thead { display: table-header-group; }
+  .cal tr    { break-inside: avoid; page-break-inside: avoid; }
+  .cal .ev   { break-inside: avoid; page-break-inside: avoid; }
+
+  <span class="c">/* 배경·테두리가 인쇄에서 누락되지 않도록 */</span>
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}</pre>
+      <div class="callout">
+        <strong>취소 건은 CSS로 감추기보다 서버에서 빼는 편이 안전합니다</strong> — 위 <span class="mono">display:none</span>은 마크업을 그대로 두고 시각적으로만 감추는 방식이라, 건수 집계가 어긋나고 취소된 일정 제목이 HTML에는 남습니다. 인쇄용 데이터를 따로 내려주는 구조라면 <b>취소 상태를 쿼리 단계에서 걸러</b> 아예 렌더링하지 않는 쪽을 권합니다. CSS 규칙은 화면 마크업을 그대로 재사용해야 할 때의 차선책입니다.
+      </div>
+      <div class="callout">
+        <strong>페이지가 넘어가는 경우</strong> — 일정이 몰린 달은 A4 한 장을 넘길 수 있습니다. <span class="mono">display: table-header-group</span>으로 요일 헤더가 2페이지에도 반복되고, <span class="mono">break-inside: avoid</span>로 한 주가 중간에 잘리지 않습니다. 한 주가 통째로 한 페이지를 넘길 만큼 일정이 많은 예외 상황에서만 해당 주가 분할됩니다.
+      </div>
+      <div class="callout callout--ask">
+        <strong>건수는 취소 건을 뺀 값으로 다시 계산합니다</strong> — 취소 일정을 감추기만 하면 상단의 "총 48건"과 날짜 옆 <span class="mono">10건</span> 배지가 실제 인쇄된 줄 수와 어긋납니다. 두 숫자 모두 <b>취소 건을 제외한 값</b>으로 집계해야 합니다. 그리고 화면에는 있던 일정이 인쇄물에서 사라지면 받는 사람이 누락으로 오해할 수 있어, 용지 상단에 <span class="mono">취소 3건 제외</span>를 한 줄 적어 명시했습니다.
+      </div>
+    </section>
+  </div>
+
+  <footer class="doc-foot no-print">
+    <div class="wrap">TM Agent Admin — 일정 관리 달력 프린트 화면(월간·주간) · v1.1 · 내부 검토용</div>
+  </footer>
+</div>
+</body>
+</html>
