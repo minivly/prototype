@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>검수 대기 — 보고회의 Agent</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<style>
+  :root{
+    --ink:#1E2430; --ink-soft:#4A5063;
+    --paper:#EFF1EC; --paper-raised:#FFFFFF;
+    --line:#D8DAD3; --line-strong:#1E2430;
+    --seal:#AB3B2E; --seal-soft:#F4E3DF;
+    --brass:#9C6B3E; --brass-soft:#F1E6D4;
+    --ok:#4B7862; --ok-soft:#E3EDE7;
+    --amber:#B8863B; --amber-soft:#F6EAD7;
+    --muted:#8B8F86;
+    --font-display:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    --font-body:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    --font-mono:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{word-break:keep-all;overflow-wrap:break-word;}
+  body{word-break:keep-all;}
+  body{
+    margin:0; background:#D9DBD3;
+    font-family:var(--font-body); color:var(--ink);
+    padding:28px;
+  }
+  .app{
+    max-width:920px; margin:0 auto;
+    background:var(--paper-raised);
+    border:1px solid var(--ink);
+    box-shadow:0 18px 40px rgba(30,36,48,.18);
+  }
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 30px; border-bottom:1px solid var(--line);
+    background:var(--ink); color:#E9E7DE;
+  }
+  .topbar .crumb{font-size:12px; font-family:var(--font-mono); color:#A7A597;}
+  .topbar .crumb b{color:#fff;}
+
+  .content{padding:30px 36px 38px;}
+
+  .doc-header{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    border:1px solid var(--line); background:var(--paper);
+    padding:20px 22px; margin-bottom:26px;
+  }
+  .doc-header h1{font-family:var(--font-display); font-size:20px; margin:0 0 12px; font-weight:700;}
+  .conf-stamp{
+    display:inline-flex; align-items:center; justify-content:center;
+    border:1.5px solid var(--brass); color:var(--brass);
+    font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:20px;
+    margin-left:10px; transform:rotate(-2deg); font-family:var(--font-mono);
+  }
+  .meta-row{display:flex; gap:26px; flex-wrap:wrap; font-size:12.5px; color:var(--ink-soft);}
+  .meta-row span b{color:var(--ink); font-weight:600;}
+  .resubmit-flag{
+    font-family:var(--font-mono); font-size:11px;
+    border:1px solid var(--amber); color:var(--amber);
+    padding:4px 10px; border-radius:2px; white-space:nowrap;
+  }
+
+  .section-title{
+    font-size:13px; font-weight:700; margin:0 0 12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-title::before{content:"";width:4px;height:14px;background:var(--ink);display:inline-block;}
+
+  .review-panel{
+    border:1px solid var(--line); background:var(--paper);
+    padding:18px; margin-bottom:26px;
+  }
+  .review-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .check-item{background:#fff; border:1px solid var(--line); padding:13px 15px;}
+  .check-item .row1{display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;}
+  .check-item .label{font-weight:700; font-size:13px;}
+  .status{
+    font-size:10.5px; font-weight:700; padding:3px 10px; border-radius:20px;
+  }
+  .status.miss{background:var(--seal-soft); color:var(--seal);}
+  .status.ok{background:var(--ok-soft); color:var(--ok);}
+  .check-item p{margin:0; color:var(--ink-soft); line-height:1.55; font-size:12.5px;}
+
+  .summary-line{
+    margin-top:14px; font-size:11.5px; color:var(--muted);
+    border-top:1px dashed var(--line); padding-top:11px; font-family:var(--font-mono);
+  }
+
+  .decision-panel{
+    border:1.5px solid var(--ink); padding:24px;
+  }
+  .decision-title{font-family:var(--font-display); font-size:15px; font-weight:700; margin-bottom:16px;}
+
+  .decision-buttons{display:flex; gap:14px; margin-bottom:18px;}
+  .dbtn{
+    flex:1; text-align:center; padding:16px 10px; border-radius:3px;
+    cursor:pointer; border:1.5px solid var(--line-strong);
+  }
+  .dbtn.approve{background:var(--ok); color:#fff; border-color:var(--ok);}
+  .dbtn.reject{background:#fff; color:var(--seal); border-color:var(--seal);}
+  .dbtn .main{font-size:14.5px; font-weight:700;}
+  .dbtn .sub{display:block; font-size:11px; font-weight:400; margin-top:4px; opacity:.85;}
+
+  .reject-form{border:1px dashed var(--seal); background:var(--seal-soft); padding:16px 18px;}
+  .reject-form label{font-size:12px; font-weight:700; display:block; margin-bottom:8px; color:#7A2A20;}
+  .reject-form textarea{
+    width:100%; height:76px; border:1px solid var(--line-strong); border-radius:2px;
+    padding:10px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;
+  }
+  .reject-form .hint{font-size:11px; color:#8A4D40; margin-top:8px;}
+  .reject-form .send-btn{
+    margin-top:12px; display:inline-block; padding:9px 18px;
+    border:none; border-radius:2px; font-size:12px; font-weight:700;
+    background:var(--seal); color:#fff; cursor:pointer;
+  }
+
+  .trace-footer{
+    margin-top:26px; padding-top:14px; border-top:1px solid var(--line);
+    font-size:11px; color:var(--muted); display:flex; justify-content:space-between;
+    font-family:var(--font-mono);
+  }
+  .trace-footer .current{color:var(--ink); font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <span class="crumb">Admin &gt; 비서실 &gt; <b>보고서 검수</b> &gt; RPT-2026-0091</span>
+  </div>
+
+  <div class="content">
+
+    <div class="doc-header">
+      <div>
+        <h1>3분기 신사업 투자 검토 보고서<span class="conf-stamp">대외비</span></h1>
+        <div class="meta-row">
+          <span>보고자 <b>전략기획팀 김OO</b></span>
+          <span>보고 예정일정 <b>9/22(월) 14:00</b></span>
+          <span>등록일 <b>9/18 09:12</b></span>
+        </div>
+      </div>
+      <div class="resubmit-flag">재제출 1회차</div>
+    </div>
+
+    <div class="section-title">Agent 자동 리뷰 결과</div>
+    <div class="review-panel">
+      <div class="review-grid">
+        <div class="check-item">
+          <div class="row1"><span class="label">① 핵심 요지·맥락</span><span class="status ok">확인됨</span></div>
+          <p>신사업 진출 배경과 목적이 1페이지에 명확히 제시됨.</p>
+        </div>
+        <div class="check-item">
+          <div class="row1"><span class="label">② 논리·근거 누락</span><span class="status miss">누락 발견</span></div>
+          <p>3번 항목 매출 추정치의 산출 근거 데이터가 첨부되지 않음.</p>
+        </div>
+        <div class="check-item">
+          <div class="row1"><span class="label">③ 보강 필요 사항</span><span class="status miss">보강 필요</span></div>
+          <p>경쟁사 비교 분석에 최신 분기 데이터 반영 필요.</p>
+        </div>
+        <div class="check-item">
+          <div class="row1"><span class="label">④ 과거 유사 보고 정합성</span><span class="status ok">이상 없음</span></div>
+          <p>지난 5월 보고 대비 방향성 상충 없음.</p>
+        </div>
+      </div>
+      <div class="summary-line">
+        점검 프레임: 신사업 투자 검토형 · 리뷰 완료 09:14 · 처리 2.1초
+      </div>
+    </div>
+
+    <div class="decision-panel">
+      <div class="decision-title">이 리뷰 결과를 승인하시겠습니까?</div>
+      <div class="decision-buttons">
+        <div class="dbtn approve">
+          <div class="main">승인</div>
+          <span class="sub">회장님 사전 평가 브리핑 대상으로 확정</span>
+        </div>
+        <div class="dbtn reject">
+          <div class="main">반려 · 보강 요청</div>
+          <span class="sub">보고자에게 피드백 발송</span>
+        </div>
+      </div>
+
+      <div class="reject-form">
+        <label>보고자에게 전달할 피드백</label>
+        <textarea>3번 항목 매출 추정 근거 데이터를 보강해주세요. 경쟁사 비교도 최신 분기 기준으로 업데이트 부탁드립니다.</textarea>
+        <div class="hint">Agent가 위 ②③번 항목을 기반으로 초안을 자동 작성했습니다. 필요 시 수정 후 발송하세요.</div>
+        <button class="send-btn">보고자에게 발송</button>
+      </div>
+    </div>
+
+    <div class="trace-footer">
+      <span>접수 → 리뷰 → <span class="current">[검수 대기]</span> → 평가브리핑 → 회신</span>
+      <span>Trace ID: TRC-0091-03</span>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
