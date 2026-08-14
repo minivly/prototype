@@ -73,12 +73,15 @@
   .nav{padding:14px 0;flex:1;}
   .nav-item{
     position:relative;
+    display:block;
     padding:11px 20px 11px 24px;
     font-size:13px;
     color:#C7C5B8;
+    text-decoration:none;
     cursor:pointer;
     border-left:3px solid transparent;
   }
+  .nav-item:not(a){cursor:default;}
   .nav-item.active{
     color:#fff;
     font-weight:600;
@@ -189,12 +192,14 @@
     font-weight:600;
   }
   .new-btn{
+    display:inline-block;
     background:var(--seal);
     color:#fff;
     border:none;
     padding:10px 18px;
     font-size:12.5px;
     font-weight:600;
+    text-decoration:none;
     border-radius:3px;
     cursor:pointer;
     box-shadow:0 2px 0 rgba(0,0,0,.15);
@@ -291,8 +296,8 @@
         <div class="sub">SECRETARIAT ADMIN</div>
       </div>
       <div class="nav">
-        <div class="nav-item active">전체 보고서 현황 <span class="tab-flag">4</span></div>
-        <div class="nav-item">점검 항목 관리</div>
+        <a class="nav-item active" href="01_Admin_대시보드.html">전체 보고서 현황 <span class="tab-flag">4</span></a>
+        <a class="nav-item" href="05_점검항목_관리.html">점검 항목 관리</a>
         <div class="nav-item">Task 관리</div>
         <div class="nav-item">이력 · Trace 조회</div>
         <div class="nav-item">설정</div>
@@ -345,7 +350,7 @@
             <div class="chip">브리핑 발송됨</div>
             <div class="chip">완료</div>
           </div>
-          <button class="new-btn">+ 보고서 등록</button>
+          <a class="new-btn" href="02_보고서_접수등록.html">+ 보고서 등록</a>
         </div>
 
         <div class="table-card">
