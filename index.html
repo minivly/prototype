@@ -17,6 +17,7 @@
     --tag-scenario: #ff9f6b;
     --tag-app: #5fd0c0;
     --tag-print: #f2c94c;
+    --tag-report: #e2586b;
     --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
   }
   *{box-sizing:border-box;}
@@ -75,6 +76,7 @@
   .dot.scenario{background:var(--tag-scenario);}
   .dot.app{background:var(--tag-app);}
   .dot.print{background:var(--tag-print);}
+  .dot.report{background:var(--tag-report);}
 
   .card{
     display:flex;
@@ -192,16 +194,23 @@
         title: "일정 관리 — 달력 프린트 화면 (월간·주간)",
         sub: "프린트",
         href: "schedule-calendar-print.html"
+      },
+      {
+        group: "report",
+        title: "보고회의 Agent — Admin 대시보드",
+        sub: "와이어프레임",
+        href: "ReportAgent/wireframes/01_Admin_대시보드.html"
       }
     ];
 
     const groupLabels = {
       scenario: { label: "텔레그램 시나리오 · 기획", dot: "scenario" },
       app:      { label: "미니앱 화면", dot: "app" },
-      print:    { label: "프린트 화면", dot: "print" }
+      print:    { label: "프린트 화면", dot: "print" },
+      report:   { label: "보고회의 Agent", dot: "report" }
     };
 
-    const order = ["scenario", "app", "print"];
+    const order = ["scenario", "app", "print", "report"];
     const container = document.getElementById("groups");
 
     order.forEach(key => {
