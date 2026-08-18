@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>보고회의 Agent 흐름</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<style>
+  :root{
+    --paper:#F7F6F3; --card:#FFFFFF; --ink:#1D1B17; --ink-soft:#6B665C; --line:#DAD5CB;
+    --accent:#C2540C;
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  .wrap{ max-width:820px; margin:0 auto; padding:40px 24px 64px; background:var(--paper); color:var(--ink);
+    font-family:'Pretendard','Apple SD Gothic Neo','Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif; }
+  h1{ font-size:1.3rem; font-weight:800; margin:0 0 6px; letter-spacing:-.01em; }
+  .lede{ font-size:.88rem; color:var(--ink-soft); margin:0 0 28px; max-width:64ch; line-height:1.6; }
+  figure{ margin:0; }
+  svg{ max-width:100%; height:auto; display:block; color:var(--ink); }
+  figcaption{ font-size:.78rem; color:var(--ink-soft); margin-top:14px; line-height:1.6; }
+  figcaption b{ color:var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>보고회의 Agent — 전체 흐름</h1>
+  <p class="lede">요구사항 명세(RPT-FUN-001~012)를 기준으로 재구성한 흐름입니다. 왼쪽 실선 루프는 보고서 보강, 오른쪽 점선 루프는 평가 기준 학습이며, 굵은 주황 화살표는 아직 연결이 정의되지 않은 구간입니다.</p>
+
+  <figure>
+    <svg viewBox="0 0 1000 1260" role="img" aria-label="보고회의 에이전트 흐름도: 1단계 보고서 리뷰·브리핑 루프와 2단계 회의 후속 처리, 그 사이 미정의 연결부를 보여준다">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+        </marker>
+        <marker id="arrowAccent" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+        </marker>
+      </defs>
+
+      <!-- zone labels -->
+      <text x="20" y="100" font-size="11" letter-spacing="1.5" font-weight="700" fill="var(--ink-soft)">1단계 · 9/18 오픈</text>
+      <text x="20" y="820" font-size="11" letter-spacing="1.5" font-weight="700" fill="var(--ink-soft)">2단계 · 10월~</text>
+
+      <!-- setup box -->
+      <rect x="650" y="20" width="230" height="52" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="765" y="42" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">점검 항목(프레임) 등록</text>
+      <text x="765" y="59" text-anchor="middle" font-size="10" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-005 · 사전 세팅</text>
+      <path d="M650,46 L620,46 L620,257 L600,257" fill="none" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <!-- n1 -->
+      <rect x="360" y="120" width="240" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="143" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">보고자 작성 → Admin 등록</text>
+      <text x="480" y="161" text-anchor="middle" font-size="10.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-001</text>
+      <line x1="480" y1="174" x2="480" y2="230" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <!-- n2 loop target -->
+      <rect x="360" y="230" width="240" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.8"/>
+      <text x="480" y="253" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">Agent 자동 리뷰</text>
+      <text x="480" y="271" text-anchor="middle" font-size="10.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-002</text>
+      <line x1="480" y1="284" x2="480" y2="315" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <!-- d1 diamond -->
+      <polygon points="480,313 585,362 480,411 375,362" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="358" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">리뷰 통과?</text>
+      <text x="480" y="374" text-anchor="middle" font-size="10" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-002 판정</text>
+
+      <!-- d1 No -> loopHub (top entry) -->
+      <path d="M375,362 L185,362 L185,468" fill="none" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <text x="270" y="352" font-size="10.5" fill="var(--ink-soft)">미흡 발견</text>
+
+      <!-- d1 Yes -> n3 -->
+      <line x1="480" y1="411" x2="480" y2="450" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <text x="496" y="435" font-size="10.5" fill="var(--ink-soft)">통과</text>
+
+      <!-- n3 -->
+      <rect x="360" y="450" width="240" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="473" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">회장님 사전 평가 브리핑</text>
+      <text x="480" y="491" text-anchor="middle" font-size="10.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-004</text>
+      <line x1="480" y1="504" x2="480" y2="533" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <!-- d2 diamond -->
+      <polygon points="480,533 605,586 480,639 355,586" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="580" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">회장님 텔레그램 회신</text>
+      <text x="480" y="597" text-anchor="middle" font-size="10" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-006</text>
+
+      <!-- d2 단순질문 -> terminal (centers aligned, single straight line) -->
+      <line x1="605" y1="586" x2="700" y2="586" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <text x="622" y="576" font-size="10.5" fill="var(--ink-soft)">단순 질문</text>
+      <rect x="700" y="559" width="175" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.1" stroke-dasharray="3 3"/>
+      <text x="787" y="581" text-anchor="middle" font-size="11.5" font-weight="600" fill="currentColor">응답만 하고 종료</text>
+      <text x="787" y="598" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)">Trace만 기록</text>
+
+      <!-- d2 보강지시 -> loopHub (second entry, right edge) -->
+      <path d="M355,586 L320,586 L320,496 L290,496" fill="none" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <text x="212" y="558" font-size="10.5" fill="var(--ink-soft)">보강 지시</text>
+
+      <!-- loopHub -->
+      <rect x="80" y="468" width="210" height="56" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.6"/>
+      <text x="185" y="491" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">비서실 확인·전달</text>
+      <text x="185" y="507" text-anchor="middle" font-size="10" fill="var(--ink-soft)">Admin PC 화면</text>
+      <text x="185" y="519" text-anchor="middle" font-size="9.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-003</text>
+      <line x1="185" y1="524" x2="185" y2="573" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <!-- reprocess -->
+      <rect x="80" y="573" width="210" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="185" y="596" text-anchor="middle" font-size="12.5" font-weight="700" fill="currentColor">보고자 보강 → 재제출</text>
+      <text x="185" y="613" text-anchor="middle" font-size="10" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-003 재리뷰 요청</text>
+
+      <!-- feedback loop back to n2 (pure right-angle, clear of loopHub/reprocess and zone labels) -->
+      <path d="M80,600 L44,600 L44,257 L360,257" fill="none" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <text x="30" y="435" font-size="10.5" fill="var(--ink-soft)" transform="rotate(-90 30 435)">재리뷰</text>
+
+      <!-- dashed learning loop (right side, mirrors solid loop — branches from d2's bottom point, clear of terminal box) -->
+      <path d="M480,639 L895,639 L895,46 L880,46"
+            fill="none" stroke="currentColor" stroke-width="1.2" stroke-opacity="0.55" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+      <text x="911" y="340" font-size="10" fill="var(--ink-soft)" transform="rotate(-90 911 340)">학습 반영 · FUN-007 (다음 건부터)</text>
+
+      <!-- gap connector to stage 2 (accent, dashed) -->
+      <line x1="480" y1="639" x2="480" y2="700" stroke="var(--accent)" stroke-width="2" stroke-dasharray="2 5" marker-end="url(#arrowAccent)"/>
+      <text x="500" y="672" font-size="11" font-weight="700" fill="var(--accent)">연결 미정의</text>
+      <text x="500" y="686" font-size="9.5" fill="var(--accent)">(실제 보고 회의 진행)</text>
+
+      <!-- stage boundary -->
+      <line x1="20" y1="760" x2="980" y2="760" stroke="var(--ink-soft)" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="500" y="754" font-size="10.5" fill="var(--ink-soft)">법무 확정 전제</text>
+
+      <line x1="480" y1="700" x2="480" y2="830" stroke="var(--accent)" stroke-width="2" stroke-dasharray="2 5" marker-end="url(#arrowAccent)"/>
+
+      <!-- stage 2 spine -->
+      <rect x="360" y="830" width="240" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="853" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">회의 청취·전사 (STT)</text>
+      <text x="480" y="871" text-anchor="middle" font-size="10.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-008</text>
+      <line x1="480" y1="884" x2="480" y2="913" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <rect x="360" y="913" width="240" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="936" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">Task 추출 → 초안 제시</text>
+      <text x="480" y="954" text-anchor="middle" font-size="10.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-009</text>
+      <line x1="480" y1="967" x2="480" y2="996" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <rect x="360" y="996" width="240" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="1019" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">Task 컨펌 → 담당 CEO 발신</text>
+      <text x="480" y="1037" text-anchor="middle" font-size="10.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-010</text>
+      <line x1="480" y1="1050" x2="480" y2="1079" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+      <rect x="360" y="1079" width="240" height="54" rx="8" fill="var(--card)" stroke="currentColor" stroke-width="1.4"/>
+      <text x="480" y="1102" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">이행 상태 추적·피드백</text>
+      <text x="480" y="1120" text-anchor="middle" font-size="10.5" font-family="ui-monospace,monospace" fill="var(--ink-soft)">FUN-011</text>
+
+      <!-- trace bracket -->
+      <line x1="920" y1="147" x2="920" y2="1106" stroke="currentColor" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="1 4"/>
+      <line x1="912" y1="147" x2="920" y2="147" stroke="currentColor" stroke-width="1" stroke-opacity="0.4"/>
+      <line x1="912" y1="1106" x2="920" y2="1106" stroke="currentColor" stroke-width="1" stroke-opacity="0.4"/>
+      <text x="936" y="630" font-size="10" fill="var(--ink-soft)" transform="rotate(-90 936 630)">Trace 기록 · 전 과정 로깅 (FUN-012)</text>
+    </svg>
+    <figcaption>
+      실선 왼쪽 루프는 보고서 보강(진입점 2개: 리뷰 미흡 / 회장님 보강 지시)이 <b>같은 "비서실 확인·전달"</b>을 거쳐 Agent 리뷰로 되돌아가는 경로입니다.
+      점선 오른쪽 루프는 회장님 피드백이 다음 건의 평가 기준에 반영되는 학습 경로(FUN-007)입니다.
+      굵은 주황 화살표는 1단계 종료와 2단계 시작 사이에 아직 정의되지 않은 연결 구간입니다.
+    </figcaption>
+  </figure>
+</div>
+
+</body>
+</html>
