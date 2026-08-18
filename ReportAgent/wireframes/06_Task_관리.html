@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Task 관리 — 보고회의 Agent</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<style>
+  :root{
+    --ink:#1E2430;
+    --ink-soft:#4A5063;
+    --paper:#EFF1EC;
+    --paper-raised:#FFFFFF;
+    --line:#D8DAD3;
+    --line-strong:#1E2430;
+    --seal:#AB3B2E;
+    --seal-soft:#F4E3DF;
+    --brass:#9C6B3E;
+    --brass-soft:#F1E6D4;
+    --ok:#4B7862;
+    --ok-soft:#E3EDE7;
+    --amber:#B8863B;
+    --amber-soft:#F6EAD7;
+    --blue:#3E4A7A;
+    --blue-soft:#E7EAF3;
+    --muted:#8B8F86;
+    --font-display:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    --font-body:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    --font-mono:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{word-break:keep-all;overflow-wrap:break-word;}
+  body{word-break:keep-all;}
+  body{
+    margin:0;
+    background:#D9DBD3;
+    font-family:var(--font-body);
+    color:var(--ink);
+    padding:28px;
+  }
+  .app{
+    max-width:1240px;
+    margin:0 auto;
+    background:var(--paper);
+    border:1px solid var(--ink);
+    box-shadow:0 18px 40px rgba(30,36,48,.18);
+    display:flex;
+    min-height:760px;
+  }
+
+  .layout{display:flex;width:100%;}
+
+  .sidebar{
+    width:220px;
+    background:var(--ink);
+    color:#E9E7DE;
+    display:flex;
+    flex-direction:column;
+  }
+  .brand{
+    padding:22px 20px 18px;
+    border-bottom:1px solid rgba(255,255,255,.14);
+  }
+  .brand .mark{
+    width:30px;height:30px;
+    border:1.5px solid #E9E7DE;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--font-display);
+    font-size:14px;
+    margin-bottom:10px;
+  }
+  .brand .name{font-family:var(--font-display);font-size:15px;font-weight:700;letter-spacing:.01em;}
+  .brand .sub{font-size:10.5px;color:#A7A597;margin-top:2px;font-family:var(--font-mono);}
+
+  .nav{padding:14px 0;flex:1;}
+  .nav-item{
+    position:relative;
+    display:block;
+    padding:11px 20px 11px 24px;
+    font-size:13px;
+    color:#C7C5B8;
+    text-decoration:none;
+    cursor:pointer;
+    border-left:3px solid transparent;
+  }
+  .nav-item:not(a){cursor:default;}
+  .nav-item.active{
+    color:#fff;
+    font-weight:600;
+    background:rgba(255,255,255,.06);
+    border-left:3px solid var(--seal);
+  }
+  .nav-item .tab-flag{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    background:var(--seal);
+    color:#fff;
+    font-family:var(--font-mono);
+    font-size:10px;
+    padding:1px 6px;
+    border-radius:2px;
+  }
+  .sidebar-foot{
+    padding:16px 20px;
+    border-top:1px solid rgba(255,255,255,.14);
+    font-size:11px;
+    color:#8D8B7E;
+    font-family:var(--font-mono);
+  }
+
+  .main{flex:1;display:flex;flex-direction:column;}
+
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:16px 30px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper-raised);
+  }
+  .topbar h1{
+    font-family:var(--font-display);
+    font-size:19px;
+    margin:0;
+    font-weight:700;
+  }
+  .topbar .date{font-size:12px;color:var(--muted);font-family:var(--font-mono);margin-top:2px;}
+  .user-chip{
+    display:flex;align-items:center;gap:8px;
+    font-size:12.5px;
+    border:1px solid var(--line);
+    padding:6px 12px;
+    border-radius:20px;
+    background:var(--paper);
+  }
+  .user-chip .avatar{
+    width:22px;height:22px;border-radius:50%;
+    background:var(--ink);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-family:var(--font-display);
+  }
+
+  .content{padding:26px 30px 36px;}
+
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .stat-card{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-top:3px solid var(--ink);
+    padding:16px 16px 14px;
+  }
+  .stat-card.attn{border-top:3px solid var(--seal);}
+  .stat-card .num{
+    font-family:var(--font-display);
+    font-size:28px;
+    font-weight:700;
+    line-height:1;
+  }
+  .stat-card .lbl{font-size:11.5px;color:var(--muted);margin-top:8px;}
+  .stat-card.attn .num{color:var(--seal);}
+
+  .board{display:flex;gap:20px;align-items:flex-start;}
+
+  /* ---- left: task list ---- */
+  .task-list{width:340px;flex:0 0 auto;background:var(--paper-raised);border:1px solid var(--line);}
+  .task-list-head{padding:14px 16px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .task-list-head .t{font-size:12px;font-weight:700;color:var(--ink-soft);}
+  .add-task-btn{
+    background:var(--seal);color:#fff;border:none;
+    padding:6px 12px;font-size:11.5px;font-weight:600;
+    border-radius:3px;cursor:pointer;
+  }
+  .list-filters{display:flex;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .lchip{font-size:11px;padding:5px 10px;border:1px solid var(--line);border-radius:14px;color:var(--ink-soft);background:var(--paper-raised);cursor:pointer;}
+  .lchip.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600;}
+
+  .task-row{
+    padding:13px 16px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    border-left:3px solid transparent;
+  }
+  .task-row:last-of-type{border-bottom:none;}
+  .task-row.sel{background:#F7F7F3;border-left:3px solid var(--seal);}
+  .task-row .name{font-size:13px;font-weight:700;margin-bottom:6px;line-height:1.4;}
+  .task-row .meta{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--muted);font-family:var(--font-mono);}
+
+  .stage-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:10.5px;font-weight:600;
+    padding:3px 9px 3px 7px;border-radius:20px;
+  }
+  .stage-badge .dot{width:5px;height:5px;border-radius:50%;}
+  .stage-badge.wait{background:var(--seal-soft);color:var(--seal);}
+  .stage-badge.wait .dot{background:var(--seal);}
+  .stage-badge.doing{background:var(--blue-soft);color:var(--blue);}
+  .stage-badge.doing .dot{background:var(--blue);}
+  .stage-badge.done{background:var(--ok-soft);color:var(--ok);}
+  .stage-badge.done .dot{background:var(--ok);}
+
+  /* ---- right: task detail ---- */
+  .task-detail{flex:1 1 auto;background:var(--paper-raised);border:1px solid var(--line);}
+  .detail-head{padding:20px 24px;border-bottom:1px solid var(--line);}
+  .detail-head-row{display:flex;align-items:center;gap:10px;justify-content:space-between;}
+  .detail-title{font-family:var(--font-display);font-size:18px;font-weight:700;}
+  .detail-due{font-size:12px;color:var(--muted);font-family:var(--font-mono);white-space:nowrap;}
+  .detail-src{margin-top:9px;font-size:12px;color:var(--ink-soft);}
+  .detail-src a{color:var(--brass);font-weight:600;text-decoration:none;border-bottom:1px solid var(--brass);}
+  .detail-org{margin-top:6px;font-size:12px;color:var(--ink-soft);}
+  .detail-org b{color:var(--ink);font-weight:700;}
+
+  .brief-box{
+    margin:18px 24px 0;
+    background:var(--paper);
+    border:1px solid var(--line);
+    padding:14px 16px;
+    font-size:12.5px;
+    line-height:1.65;
+    color:var(--ink-soft);
+  }
+  .brief-box .lbl{font-size:11px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+
+  .panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:20px 24px 24px;}
+  .panel{border:1px solid var(--line);background:var(--paper-raised);}
+  .panel-head{
+    padding:12px 16px;border-bottom:1px solid var(--line);
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .panel-head .t{font-size:12.5px;font-weight:700;}
+  .panel-head .owner{font-size:10px;color:var(--muted);font-family:var(--font-mono);margin-top:2px;}
+  .panel-add{
+    font-size:11px;font-weight:600;color:#fff;
+    background:var(--ink);border:none;border-radius:3px;
+    padding:6px 10px;cursor:pointer;white-space:nowrap;
+  }
+  .panel-body{padding:12px 16px 16px;}
+
+  .file-row{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 0;border-bottom:1px solid var(--line);
+    font-size:12px;
+  }
+  .file-row:last-of-type{border-bottom:none;}
+  .file-row .ico{
+    width:26px;height:26px;flex:0 0 auto;
+    background:var(--paper);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);
+  }
+  .file-row .fname{font-weight:600;}
+  .file-row .fmeta{font-size:10.5px;color:var(--muted);font-family:var(--font-mono);margin-top:2px;}
+
+  .sched-card{border:1px solid var(--line);background:var(--paper);padding:13px 14px;}
+  .sched-card .t{font-size:13px;font-weight:700;margin-bottom:6px;}
+  .sched-card .m{font-size:11.5px;color:var(--ink-soft);font-family:var(--font-mono);}
+  .sched-card .who{margin-top:8px;font-size:11px;color:var(--muted);}
+
+  .empty-mini{
+    text-align:center;padding:22px 10px;color:var(--muted);font-size:12px;
+  }
+
+  .detail-footer{
+    margin:0 24px 22px;padding-top:12px;border-top:1px solid var(--line);
+    font-size:11px;color:var(--muted);font-family:var(--font-mono);
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="layout">
+
+    <div class="sidebar">
+      <div class="brand">
+        <div class="mark">報</div>
+        <div class="name">보고회의 Agent</div>
+        <div class="sub">SECRETARIAT ADMIN</div>
+      </div>
+      <div class="nav">
+        <a class="nav-item" href="01_Admin_대시보드.html">전체 보고서 현황 <span class="tab-flag">4</span></a>
+        <a class="nav-item" href="05_점검항목_관리.html">점검 항목 관리</a>
+        <a class="nav-item active" href="06_Task_관리.html">Task 관리</a>
+        <div class="nav-item">이력 · Trace 조회</div>
+        <div class="nav-item">설정</div>
+      </div>
+      <div class="sidebar-foot">v1.0 · 1단계 · 9/18 OPEN</div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <h1>Task 관리</h1>
+          <div class="date">2026년 9월 19일 (금)</div>
+        </div>
+        <div class="user-chip">
+          <div class="avatar">비</div>
+          비서실 · 조유진
+        </div>
+      </div>
+
+      <div class="content">
+
+        <div class="stat-row">
+          <div class="stat-card attn">
+            <div class="num">2</div>
+            <div class="lbl">자료 대기</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">3</div>
+            <div class="lbl">진행 중</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">1</div>
+            <div class="lbl">일정 미연결</div>
+          </div>
+          <div class="stat-card">
+            <div class="num">6</div>
+            <div class="lbl">이번 달 완료</div>
+          </div>
+        </div>
+
+        <div class="board">
+
+          <!-- LEFT: task list -->
+          <div class="task-list">
+            <div class="task-list-head">
+              <span class="t">Task 목록 · 4건</span>
+              <button class="add-task-btn">+ Task 생성</button>
+            </div>
+            <div class="list-filters">
+              <span class="lchip on">전체</span>
+              <span class="lchip">자료 대기</span>
+              <span class="lchip">진행 중</span>
+              <span class="lchip">완료</span>
+            </div>
+
+            <div class="task-row sel">
+              <div class="name">한빛테크 장기계약 조건 최종 회신</div>
+              <div class="meta">
+                <span class="stage-badge wait"><span class="dot"></span>자료 대기</span>
+                <span>D-7 · 9/26</span>
+              </div>
+            </div>
+
+            <div class="task-row">
+              <div class="name">하반기 워크숍 후속 예산안 정리</div>
+              <div class="meta">
+                <span class="stage-badge doing"><span class="dot"></span>진행 중</span>
+                <span>D-5 · 9/24</span>
+              </div>
+            </div>
+
+            <div class="task-row">
+              <div class="name">투자 검토 관련 법무 검토 요청</div>
+              <div class="meta">
+                <span class="stage-badge doing"><span class="dot"></span>진행 중</span>
+                <span>D-6 · 9/25</span>
+              </div>
+            </div>
+
+            <div class="task-row">
+              <div class="name">해외법인 실적 보완자료 회신</div>
+              <div class="meta">
+                <span class="stage-badge done"><span class="dot"></span>완료</span>
+                <span>9/21 완료</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: task detail -->
+          <div class="task-detail">
+            <div class="detail-head">
+              <div class="detail-head-row">
+                <span class="detail-title">한빛테크 장기계약 조건 최종 회신</span>
+                <span class="detail-due">마감 9/26(토)</span>
+              </div>
+              <div class="detail-src">출처 — <a href="03_검수대기.html">RPT-2026-0091 · 3분기 신사업 투자 검토 보고서 →</a></div>
+              <div class="detail-org">담당 조직 — <b>업무지원실</b> · 생성 9/19 · 생성자 비서실 조유진</div>
+            </div>
+
+            <div class="brief-box">
+              <div class="lbl">지시 내용</div>
+              장기계약 조건(3년, 물량 15% 증량) 관련 한빛테크놀로지스 측에 전달할 최종 회신안을 준비합니다. 법무 검토를 거쳐 9/26까지 회신 완료.
+            </div>
+
+            <div class="panel-grid">
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <div class="t">보고자료 · 사후관리</div>
+                    <div class="owner">담당 — 업무지원실</div>
+                  </div>
+                  <button class="panel-add">+ 자료 업로드</button>
+                </div>
+                <div class="panel-body">
+                  <div class="file-row">
+                    <div class="ico">PDF</div>
+                    <div>
+                      <div class="fname">장기계약_조건_검토안_v2.pdf</div>
+                      <div class="fmeta">업무지원실 이OO · 9/20 11:40</div>
+                    </div>
+                  </div>
+                  <div class="file-row">
+                    <div class="ico">DOC</div>
+                    <div>
+                      <div class="fname">법무 검토 의견서.docx</div>
+                      <div class="fmeta">업무지원실 이OO · 9/21 09:05</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  <div>
+                    <div class="t">연결된 일정</div>
+                    <div class="owner">담당 — 비서실</div>
+                  </div>
+                  <button class="panel-add">+ 일정 연결</button>
+                </div>
+                <div class="panel-body">
+                  <div class="sched-card">
+                    <div class="t">한빛테크 회신 미팅</div>
+                    <div class="m">9/26(토) 10:00 · 60분 · 본사 27층 대회의실</div>
+                    <div class="who">일정 에이전트 캘린더에 등록됨 · 비서실 조유진</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-footer">Task ID: TSK-2026-014 · 마지막 업데이트 9/21 09:05</div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
