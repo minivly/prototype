@@ -6,134 +6,100 @@
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
 <style>
   :root{
-    --ink:#1E2430; --ink-soft:#4A5063;
-    --paper:#EFF1EC; --paper-raised:#FFFFFF;
-    --line:#D8DAD3; --line-strong:#1E2430;
-    --seal:#AB3B2E; --seal-soft:#F4E3DF;
-    --brass:#9C6B3E; --brass-soft:#F1E6D4;
-    --muted:#8B8F86;
-    --font-display:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
-    --font-body:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
-    --font-mono:'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    --bg:#F5F5F7;
+    --ink:#15171C; --ink-soft:#6B6E76; --ink-faint:#9A9CA3;
+    --card:#FFFFFF; --card-soft:#F7F7F8;
+    --line:#E7E7EA;
+    --danger:#E5484D; --danger-soft:#FDECEC;
+    --blue:#3E63DD; --blue-soft:#EDF1FD;
+    --ok:#1F8A5F; --ok-soft:#E6F4EC;
+    --font:'Pretendard Variable','Pretendard',-apple-system,sans-serif;
   }
   *{box-sizing:border-box;}
   html{word-break:keep-all;overflow-wrap:break-word;}
-  body{word-break:keep-all;}
-  body{
-    margin:0; background:#D9DBD3;
-    font-family:var(--font-body); color:var(--ink);
-    padding:28px;
-  }
-  .app{
-    max-width:800px; margin:0 auto;
-    background:var(--paper-raised);
-    border:1px solid var(--ink);
-    box-shadow:0 18px 40px rgba(30,36,48,.18);
-  }
+  body{margin:0; background:var(--bg); font-family:var(--font); color:var(--ink); padding:28px;}
+
+  .app{max-width:760px; margin:0 auto; background:var(--card); border:1px solid var(--line); border-radius:20px; overflow:hidden;}
   .topbar{
     display:flex; justify-content:space-between; align-items:center;
-    padding:16px 30px; border-bottom:1px solid var(--line);
-    background:var(--ink); color:#E9E7DE;
+    padding:16px 28px; border-bottom:1px solid var(--line);
+    background:var(--ink); color:#E9E9EC;
   }
-  .topbar .crumb{font-size:12px; font-family:var(--font-mono); color:#A7A597;}
+  .topbar .crumb{font-size:12px; color:#9A9CA3;}
   .topbar .crumb b{color:#fff;}
-  .topbar .close{font-size:18px; opacity:.6; cursor:pointer; text-decoration:none; color:inherit;}
+  .topbar .close{
+    width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; opacity:.85; cursor:pointer; text-decoration:none; color:inherit;
+  }
 
-  .content{padding:32px 40px 40px;}
-  .page-head h1{
-    font-family:var(--font-display); font-size:23px; margin:0 0 6px; font-weight:700;
-  }
-  .page-head .desc{font-size:13px; color:var(--muted); margin-bottom:30px;}
+  .content{padding:32px 36px 40px;}
+  .page-head h1{font-size:22px; margin:0 0 6px; font-weight:800; letter-spacing:-.01em;}
+  .page-head .desc{font-size:13px; color:var(--ink-faint); margin-bottom:28px;}
 
-  .group{
-    border:1px solid var(--line);
-    margin-bottom:20px;
-  }
-  .group-head{
-    background:var(--paper);
-    padding:9px 16px;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:.05em;
-    color:var(--ink-soft);
-    text-transform:uppercase;
-    border-bottom:1px solid var(--line);
-  }
-  .group-body{padding:20px 20px 6px;}
+  .group{background:var(--card-soft); border:1px solid var(--line); border-radius:16px; margin-bottom:16px; padding:20px 22px;}
+  .group-head{font-size:11px; font-weight:700; letter-spacing:.05em; color:var(--ink-faint); text-transform:uppercase; margin-bottom:16px;}
 
-  .field{margin-bottom:18px;}
-  label{
-    display:block; font-size:12.5px; font-weight:600; margin-bottom:7px;
-  }
-  label .req{color:var(--seal); margin-left:2px;}
-  label .desc{font-weight:400; color:var(--muted); font-size:11px; margin-left:6px;}
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  label{display:block; font-size:12.5px; font-weight:700; margin-bottom:7px;}
+  label .req{color:var(--danger); margin-left:2px;}
+  label .desc{font-weight:400; color:var(--ink-faint); font-size:11px; margin-left:6px;}
 
   input[type=text], select{
-    width:100%; padding:11px 13px;
-    border:1px solid var(--line); border-radius:2px;
+    width:100%; padding:11px 14px;
+    border:1px solid var(--line); border-radius:10px;
     font-size:13.5px; font-family:inherit;
     background:#fff; color:var(--ink);
   }
   input[type=text]:focus, select:focus{
-    outline:none; border-color:var(--ink); box-shadow:0 0 0 3px rgba(30,36,48,.08);
+    outline:none; border-color:var(--ink); box-shadow:0 0 0 3px rgba(21,23,28,.08);
   }
 
-  .radio-row{display:flex; gap:10px;}
+  .radio-row{display:flex; gap:8px;}
   .radio-opt{
-    flex:1; border:1px solid var(--line); border-radius:2px;
-    padding:13px 10px; font-size:12.5px; text-align:center; cursor:pointer;
-    transition:.1s;
+    flex:1; border:1px solid var(--line); border-radius:12px; background:#fff;
+    padding:13px 10px; font-size:12.5px; text-align:center; cursor:pointer; font-weight:600;
   }
-  .radio-opt .sub{display:block; font-size:10.5px; color:var(--muted); margin-top:3px; font-weight:400;}
-  .radio-opt.selected{
-    border:1.5px solid var(--brass); background:var(--brass-soft); font-weight:700; color:var(--brass);
-  }
-  .radio-opt.selected .sub{color:#9C6B3E; opacity:.8;}
+  .radio-opt .sub{display:block; font-size:10.5px; color:var(--ink-faint); margin-top:3px; font-weight:400;}
+  .radio-opt.selected{background:var(--ink); border-color:var(--ink); color:#fff;}
+  .radio-opt.selected .sub{color:#C7C8CC;}
 
   .dropzone{
-    border:1.5px dashed var(--line-strong);
-    border-radius:3px;
+    border:1.5px dashed #C7C8CC;
+    border-radius:14px;
     padding:26px; text-align:center; font-size:13px; color:var(--ink-soft);
-    background:var(--paper);
+    background:#fff;
   }
-  .dropzone .icon{font-size:22px; margin-bottom:8px;}
+  .dropzone .icon{font-size:20px; margin-bottom:8px; color:var(--ink-faint);}
   .dropzone .file{
     display:inline-flex; align-items:center; gap:8px;
-    margin-top:12px; border:1px solid var(--line-strong); border-radius:2px;
-    padding:6px 12px; font-size:12px; background:#fff; font-family:var(--font-mono);
+    margin-top:12px; border:1px solid var(--line); border-radius:999px;
+    padding:6px 14px; font-size:12px; background:var(--card-soft);
   }
   .dropzone .file .badge{
-    background:var(--ok, #4B7862); color:#fff; font-size:9px; padding:1px 5px; border-radius:2px;
+    background:var(--ok); color:#fff; font-size:9px; padding:2px 7px; border-radius:999px; font-weight:700;
   }
 
   .datetime-row{display:flex; gap:10px;}
   .datetime-row > div{flex:1;}
 
   .info-box{
-    border:1px solid var(--brass);
-    background:var(--brass-soft);
+    border:1px solid var(--line);
+    background:var(--blue-soft);
+    border-radius:14px;
     padding:16px 18px;
-    font-size:12.5px; color:#6B4A28; line-height:1.7;
+    font-size:12.5px; color:#334;line-height:1.7;
     margin-bottom:24px;
-    position:relative;
   }
-  .info-box b{display:block; margin-bottom:6px; color:#523A21;}
-  .info-box::before{
-    content:"※";
-    position:absolute; left:-1px; top:-1px;
-  }
+  .info-box b{display:block; margin-bottom:6px; color:var(--blue);}
 
-  .submit-row{
-    display:flex; justify-content:flex-end; gap:10px;
-  }
-  .btn{
-    padding:12px 24px; font-size:13.5px; font-weight:700;
-    border-radius:2px; cursor:pointer; border:none;
-  }
-  .btn.primary{background:var(--seal); color:#fff; box-shadow:0 2px 0 rgba(0,0,0,.15);}
-  .btn.ghost{background:#fff; color:var(--ink); border:1px solid var(--line-strong);}
+  .submit-row{display:flex; justify-content:flex-end; gap:10px;}
+  .btn{padding:11px 22px; font-size:13.5px; font-weight:700; border-radius:10px; cursor:pointer; border:none;}
+  .btn.primary{background:var(--ink); color:#fff;}
+  .btn.ghost{background:#fff; color:var(--ink); border:1px solid var(--line);}
 
-  .auto-note{font-size:11px; color:var(--muted); margin-top:10px; text-align:right; font-family:var(--font-mono);}
+  .auto-note{font-size:11.5px; color:var(--ink-faint); margin-top:10px; text-align:right;}
 </style>
 </head>
 <body>
@@ -152,59 +118,53 @@
 
     <div class="group">
       <div class="group-head">문서 정보</div>
-      <div class="group-body">
-        <div class="field">
-          <label>보고서 제목<span class="req">*</span></label>
-          <input type="text" value="3분기 신사업 투자 검토 보고서">
-        </div>
-        <div class="field">
-          <label>보고자<span class="req">*</span> <span class="desc">부서 / 이름</span></label>
-          <input type="text" value="전략기획팀 김OO">
-        </div>
-        <div class="field">
-          <label>파일 업로드<span class="req">*</span></label>
-          <div class="dropzone">
-            <div class="icon">⇧</div>
-            문서를 여기로 끌어다 놓거나 클릭하여 업로드
-            <div class="file">3분기_신사업_투자검토.pptx · 4.2MB <span class="badge">완료</span></div>
-          </div>
+      <div class="field">
+        <label>보고서 제목<span class="req">*</span></label>
+        <input type="text" value="3분기 신사업 투자 검토 보고서">
+      </div>
+      <div class="field">
+        <label>보고자<span class="req">*</span> <span class="desc">부서 / 이름</span></label>
+        <input type="text" value="전략기획팀 김OO">
+      </div>
+      <div class="field">
+        <label>파일 업로드<span class="req">*</span></label>
+        <div class="dropzone">
+          <div class="icon">⇧</div>
+          문서를 여기로 끌어다 놓거나 클릭하여 업로드
+          <div class="file">3분기_신사업_투자검토.pptx · 4.2MB <span class="badge">완료</span></div>
         </div>
       </div>
     </div>
 
     <div class="group">
       <div class="group-head">등급 · 보안</div>
-      <div class="group-body">
-        <div class="field">
-          <label>기밀 등급<span class="req">*</span></label>
-          <div class="radio-row">
-            <div class="radio-opt">일반</div>
-            <div class="radio-opt selected">대외비<span class="sub">비서실 · 회장님만 열람</span></div>
-            <div class="radio-opt">1급 기밀<span class="sub">별도 승인 필요</span></div>
-          </div>
+      <div class="field">
+        <label>기밀 등급<span class="req">*</span></label>
+        <div class="radio-row">
+          <div class="radio-opt">일반</div>
+          <div class="radio-opt selected">대외비<span class="sub">비서실 · 회장님만 열람</span></div>
+          <div class="radio-opt">1급 기밀<span class="sub">별도 승인 필요</span></div>
         </div>
       </div>
     </div>
 
     <div class="group">
       <div class="group-head">일정 · 프레임</div>
-      <div class="group-body">
-        <div class="field">
-          <label>보고 예정일정<span class="req">*</span> <span class="desc">캘린더 · 일정 Agent 자동 연계</span></label>
-          <div class="datetime-row">
-            <div><input type="text" value="2026-09-22"></div>
-            <div><input type="text" value="14:00"></div>
-          </div>
+      <div class="field">
+        <label>보고 예정일정<span class="req">*</span> <span class="desc">캘린더 · 일정 Agent 자동 연계</span></label>
+        <div class="datetime-row">
+          <div><input type="text" value="2026-09-22"></div>
+          <div><input type="text" value="14:00"></div>
         </div>
-        <div class="field">
-          <label>점검 항목(프레임) 선택<span class="req">*</span> <span class="desc">사전 등록된 목록</span></label>
-          <select>
-            <option>신사업 투자 검토형</option>
-            <option>실적 점검형</option>
-            <option>인력·조직 계획형</option>
-            <option>+ 새 프레임 등록...</option>
-          </select>
-        </div>
+      </div>
+      <div class="field">
+        <label>점검 항목(프레임) 선택<span class="req">*</span> <span class="desc">사전 등록된 목록</span></label>
+        <select>
+          <option>신사업 투자 검토형</option>
+          <option>실적 점검형</option>
+          <option>인력·조직 계획형</option>
+          <option>+ 새 프레임 등록...</option>
+        </select>
       </div>
     </div>
 
