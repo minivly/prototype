@@ -9,6 +9,7 @@
   :root{
     --bg: #14161c;
     --bg-panel: #1c1f28;
+    --bg-panel-hover: #20242f;
     --line: #2b2f3a;
     --text: #e9eaee;
     --text-dim: #8b8f9c;
@@ -18,6 +19,7 @@
     --tag-app: #5fd0c0;
     --tag-print: #f2c94c;
     --tag-report: #e2586b;
+    --tag-process: #8b93f8;
     --mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
   }
   *{box-sizing:border-box;}
@@ -29,12 +31,12 @@
     -webkit-font-smoothing:antialiased;
   }
   .wrap{
-    max-width:880px;
+    max-width:640px;
     margin:0 auto;
     padding:72px 24px 120px;
   }
   header{
-    margin-bottom:56px;
+    margin-bottom:48px;
   }
   .eyebrow{
     font-family:var(--mono);
@@ -45,7 +47,7 @@
     margin-bottom:14px;
   }
   h1{
-    font-size:34px;
+    font-size:32px;
     font-weight:700;
     line-height:1.35;
     margin:0 0 12px;
@@ -57,33 +59,93 @@
     line-height:1.6;
     margin:0;
   }
-  .group{
-    margin-bottom:44px;
+
+  /* ---- main grid: 5 square tiles ---- */
+  .tile-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:14px;
   }
-  .group-title{
+  .tile{
+    aspect-ratio:1;
     display:flex;
+    flex-direction:column;
     align-items:center;
+    justify-content:center;
     gap:10px;
-    font-size:13px;
-    color:var(--text-dim);
-    margin-bottom:14px;
-    font-family:var(--mono);
+    background:var(--bg-panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    cursor:pointer;
+    text-align:center;
+    padding:14px;
+    transition:border-color .15s ease, transform .15s ease, background .15s ease;
   }
-  .group-title .dot{
-    width:7px;height:7px;border-radius:50%;
+  .tile:hover{
+    border-color:var(--accent);
+    background:var(--bg-panel-hover);
+    transform:translateY(-2px);
+  }
+  .tile:focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:2px;
+  }
+  .tile .dot{
+    width:11px;height:11px;border-radius:50%;
     flex-shrink:0;
+  }
+  .tile .tile-label{
+    font-size:14px;
+    font-weight:600;
+    line-height:1.4;
+  }
+  .tile .tile-count{
+    font-size:10.5px;
+    color:var(--text-dim);
+    font-family:var(--mono);
   }
   .dot.scenario{background:var(--tag-scenario);}
   .dot.app{background:var(--tag-app);}
   .dot.print{background:var(--tag-print);}
   .dot.report{background:var(--tag-report);}
+  .dot.process{background:var(--tag-process);}
+
+  /* ---- detail view ---- */
+  .detail-view{ display:none; }
+  .detail-view.active{ display:block; }
+  .tile-grid.hidden{ display:none; }
+
+  .back-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-family:'Pretendard', -apple-system, sans-serif;
+    font-size:13px;
+    cursor:pointer;
+    padding:0;
+    margin-bottom:20px;
+  }
+  .back-btn:hover{ color:var(--text); }
+
+  .detail-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:19px;
+    font-weight:700;
+    margin-bottom:18px;
+  }
+  .detail-title .dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
 
   .card{
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:16px;
-    padding:18px 20px;
+    padding:16px 18px;
     background:var(--bg-panel);
     border:1px solid var(--line);
     border-radius:10px;
@@ -94,30 +156,16 @@
   }
   .card:hover{
     border-color:var(--accent);
-    background:#20242f;
+    background:var(--bg-panel-hover);
     transform:translateX(2px);
   }
   .card:focus-visible{
     outline:2px solid var(--accent);
     outline-offset:2px;
   }
-  .card-left{
-    display:flex;
-    align-items:baseline;
-    gap:14px;
-    min-width:0;
-  }
   .card-title{
-    font-size:15.5px;
+    font-size:14.5px;
     font-weight:600;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .card-sub{
-    font-size:12.5px;
-    color:var(--text-dim);
-    white-space:nowrap;
   }
   .arrow{
     font-family:var(--mono);
@@ -130,16 +178,20 @@
     color:var(--accent);
     transform:translateX(3px);
   }
+
   footer{
-    margin-top:60px;
+    margin-top:48px;
     padding-top:24px;
     border-top:1px solid var(--line);
     font-size:12.5px;
     color:var(--text-dim);
     font-family:var(--mono);
   }
+  @media (max-width:420px){
+    .tile-grid{ grid-template-columns:repeat(2, 1fr); }
+  }
   @media (prefers-reduced-motion: reduce){
-    .card, .arrow{transition:none;}
+    .tile, .card, .arrow{ transition:none; }
   }
 </style>
 </head>
@@ -149,101 +201,125 @@
   <header>
     <div class="eyebrow">Prototype Index</div>
     <h1>SK AI Agent 작업 모음<br>AI 비서실 · 텔레그램 프로토타입</h1>
-    <p>클로드로 만든 목업 페이지들을 한곳에 모아둔 인덱스입니다. 카드를 클릭하면 각 페이지로 이동합니다.</p>
+    <p>클로드로 만든 목업 페이지들을 한곳에 모아둔 인덱스입니다. 카드를 클릭하면 세부 링크로 이동합니다.</p>
   </header>
 
-  <div id="groups"></div>
+  <div class="tile-grid" id="tile-grid"></div>
 
-  <footer id="footer-count">
-    각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다
-  </footer>
+  <div class="detail-view" id="detail-view">
+    <button class="back-btn" id="back-btn">← 전체 보기</button>
+    <div class="detail-title" id="detail-title"></div>
+    <div id="detail-links"></div>
+  </div>
+
+  <footer id="footer-count"></footer>
 
   <!-- ============================================
        ▼ 새 항목 추가는 여기 배열만 수정하면 됩니다.
-       group: "scenario" | "app" | "print"
+       key: URL 해시로 쓰이는 고유 식별자 (영문)
+       dot: 색상 클래스 (scenario | app | print | report | process)
        href: 실제 github pages 파일 경로로 교체하세요
        ============================================ -->
   <script>
-    const items = [
+    const groups = [
       {
-        group: "scenario",
-        title: "AI 비서실 텔레그램 서비스 기획서",
-        sub: "기획서",
-        href: "ai-secretary-planning.html"
+        key: "scenario",
+        title: "텔레그램 시나리오",
+        dot: "scenario",
+        links: [
+          { title: "AI 비서실 텔레그램 서비스 기획서", href: "ai-secretary-planning.html" },
+          { title: "일정 에이전트 — 텔레그램 시나리오", href: "schedule-agent-telegram-scenario.html" }
+        ]
       },
       {
-        group: "scenario",
-        title: "일정 에이전트 — 텔레그램 메시지 시나리오",
-        sub: "시나리오",
-        href: "schedule-agent-telegram-scenario.html"
+        key: "app",
+        title: "미니앱 화면",
+        dot: "app",
+        links: [
+          { title: "TM Avatar — 구성원의 VOICE", href: "tm-avatar-voice.html" },
+          { title: "일정 에이전트 — 미니앱 화면", href: "schedule-agent-miniapp-final.html" }
+        ]
       },
       {
-        group: "app",
-        title: "TM Avatar — 구성원의 VOICE 미니앱",
-        sub: "미니앱",
-        href: "tm-avatar-voice.html"
+        key: "print",
+        title: "프린트 화면",
+        dot: "print",
+        links: [
+          { title: "일정 관리 — 월간·주간 달력 프린트", href: "schedule-calendar-print.html" }
+        ]
       },
       {
-        group: "app",
-        title: "일정 에이전트 — 미니앱 화면 (최종)",
-        sub: "미니앱 · 최종",
-        href: "schedule-agent-miniapp-final.html"
+        key: "report",
+        title: "보고회의 대시보드",
+        dot: "report",
+        links: [
+          { title: "보고회의 Agent — Admin 대시보드", href: "ReportAgent/wireframes/01_Admin_대시보드.html" }
+        ]
       },
       {
-        group: "print",
-        title: "일정 관리 — 달력 프린트 화면 (월간·주간)",
-        sub: "프린트",
-        href: "schedule-calendar-print.html"
-      },
-      {
-        group: "report",
-        title: "보고회의 Agent — Admin 대시보드",
-        sub: "와이어프레임",
-        href: "ReportAgent/wireframes/01_Admin_대시보드.html"
+        key: "process",
+        title: "프로세스",
+        dot: "process",
+        links: [
+          { title: "전체 흐름", href: "ReportAgent/diagrams/01_Task_연결_프로세스.html" },
+          { title: "보고회의 Agent 흐름", href: "ReportAgent/diagrams/02_보고회의_Agent_흐름.html" }
+        ]
       }
     ];
 
-    const groupLabels = {
-      scenario: { label: "텔레그램 시나리오 · 기획", dot: "scenario" },
-      app:      { label: "미니앱 화면", dot: "app" },
-      print:    { label: "프린트 화면", dot: "print" },
-      report:   { label: "보고회의 Agent", dot: "report" }
-    };
+    const tileGrid = document.getElementById("tile-grid");
+    const detailView = document.getElementById("detail-view");
+    const detailTitle = document.getElementById("detail-title");
+    const detailLinks = document.getElementById("detail-links");
+    const backBtn = document.getElementById("back-btn");
 
-    const order = ["scenario", "app", "print", "report"];
-    const container = document.getElementById("groups");
-
-    order.forEach(key => {
-      const groupItems = items.filter(i => i.group === key);
-      if (groupItems.length === 0) return;
-
-      const section = document.createElement("div");
-      section.className = "group";
-
-      const titleEl = document.createElement("div");
-      titleEl.className = "group-title";
-      titleEl.innerHTML = `<span class="dot ${groupLabels[key].dot}"></span>${groupLabels[key].label}`;
-      section.appendChild(titleEl);
-
-      groupItems.forEach(item => {
-        const a = document.createElement("a");
-        a.className = "card";
-        a.href = item.href;
-        a.innerHTML = `
-          <div class="card-left">
-            <span class="card-title">${item.title}</span>
-            <span class="card-sub">${item.sub}</span>
-          </div>
-          <span class="arrow">→</span>
-        `;
-        section.appendChild(a);
-      });
-
-      container.appendChild(section);
+    groups.forEach(group => {
+      const tile = document.createElement("button");
+      tile.className = "tile";
+      tile.type = "button";
+      tile.innerHTML = `
+        <span class="dot ${group.dot}"></span>
+        <span class="tile-label">${group.title}</span>
+        <span class="tile-count">${group.links.length}개</span>
+      `;
+      tile.addEventListener("click", () => { location.hash = "/" + group.key; });
+      tileGrid.appendChild(tile);
     });
 
+    function showGrid(){
+      tileGrid.classList.remove("hidden");
+      detailView.classList.remove("active");
+    }
+
+    function showDetail(key){
+      const group = groups.find(g => g.key === key);
+      if (!group){ showGrid(); return; }
+      tileGrid.classList.add("hidden");
+      detailView.classList.add("active");
+      detailTitle.innerHTML = `<span class="dot ${group.dot}"></span>${group.title}`;
+      detailLinks.innerHTML = "";
+      group.links.forEach(link => {
+        const a = document.createElement("a");
+        a.className = "card";
+        a.href = link.href;
+        a.innerHTML = `<span class="card-title">${link.title}</span><span class="arrow">→</span>`;
+        detailLinks.appendChild(a);
+      });
+    }
+
+    backBtn.addEventListener("click", () => { location.hash = ""; });
+
+    function route(){
+      const hash = location.hash.replace(/^#\/?/, "");
+      if (hash) showDetail(hash);
+      else showGrid();
+    }
+    window.addEventListener("hashchange", route);
+    route();
+
+    const total = groups.reduce((n, g) => n + g.links.length, 0);
     document.getElementById("footer-count").textContent =
-      `총 ${items.length}개 페이지 · 각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다`;
+      `${groups.length}개 카테고리 · 총 ${total}개 페이지 · 각 파일을 같은 저장소에 push하면 링크가 바로 연결됩니다`;
   </script>
 
 </div>
