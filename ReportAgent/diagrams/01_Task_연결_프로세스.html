@@ -33,7 +33,7 @@
   <p class="lede">Task 생성부터 미팅 준비·진행·사후관리를 거쳐 회장님이 텔레그램에서 브리핑을 받고 질의응답하기까지, 세 시스템을 오가는 흐름입니다. 상단 3개 레인은 각 시스템(보고회의 Agent · 일정 에이전트 · 텔레그램)을 나타내고, 주황 화살표는 미팅·자료가 추가로 필요할 때 되돌아가는 반복 루프입니다.</p>
 
   <figure>
-    <svg viewBox="0 0 1420 1240" role="img" aria-label="Task 관리에서 자료 업로드로 미팅을 준비한다. 업무지원실이 희망 일정을 제안하면 비서실이 일정을 조율·확정하고, 그 결과가 캘린더 신규 일정과 브리핑으로 이어져 회장님이 텔레그램에서 일정과 토킹포인트를 확인한다. 미팅 후 자료·회의록을 추가하고 필요하면 추가 미팅 예약이나 자료 보강 루프를 돈 뒤, 보고자료가 완성되면 텔레그램 알림과 질의응답으로 이어지며, 전 과정은 회장님에게 Task 진행현황으로 상시 보고된다.">
+    <svg viewBox="0 0 1420 1240" role="img" aria-label="Task 관리에서 자료 업로드로 미팅을 준비한다. 업무지원실이 희망 일정을 제안하면 일정 에이전트 쪽에서 비서실이 일정을 조율·확정하고, 그 결과가 캘린더 신규 일정과 브리핑으로 이어져 회장님이 텔레그램에서 일정과 토킹포인트를 확인한다. 미팅 후 자료·회의록을 추가하고 필요하면 추가 미팅 예약이나 자료 보강 루프를 돈 뒤, 보고자료가 완성되면 텔레그램 알림과 질의응답으로 이어지며, 전 과정은 회장님에게 Task 진행현황으로 상시 보고된다.">
       <defs>
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
@@ -77,23 +77,22 @@
       <text x="220" y="285" text-anchor="middle" font-size="13" font-weight="700">희망 일정 제안</text>
       <text x="220" y="303" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">업무지원실, 가능한 시간대 제시</text>
 
-      <!-- A3 -> A3b -->
-      <line x1="220" y1="318" x2="220" y2="348" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
-      <text x="234" y="338" font-size="9.5" fill="var(--ink-faint)">일정 조율 요청</text>
+      <!-- A3 -> 일정조율확정 (Lane B) -->
+      <line x1="370" y1="290" x2="440" y2="290" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
+      <text x="405" y="282" text-anchor="middle" font-size="9.5" fill="var(--ink-faint)">희망 일정 전달</text>
 
-      <!-- A3b 일정 조율·확정 (비서실) -->
-      <rect x="70" y="348" width="300" height="56" rx="2" fill="var(--card)" stroke="currentColor" stroke-width="1.3"/>
-      <text x="220" y="371" text-anchor="middle" font-size="13" font-weight="700">일정 조율·확정</text>
-      <text x="220" y="389" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">비서실, 실제 일정 확정</text>
+      <!-- 일정 조율·확정 (일정 에이전트, 비서실) -->
+      <rect x="440" y="262" width="272" height="56" rx="2" fill="var(--card)" stroke="currentColor" stroke-width="1.3"/>
+      <text x="576" y="285" text-anchor="middle" font-size="13" font-weight="700">일정 조율·확정</text>
+      <text x="576" y="303" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">비서실, 일정 에이전트에서 조율</text>
 
-      <!-- A3b -> B1 -->
-      <line x1="370" y1="376" x2="440" y2="376" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
-      <text x="405" y="368" text-anchor="middle" font-size="9.5" fill="var(--ink-faint)">확정 일정 등록</text>
+      <!-- 일정조율확정 -> B1 -->
+      <line x1="576" y1="318" x2="576" y2="348" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
 
       <!-- B1 캘린더 신규 일정 -->
       <rect x="440" y="348" width="272" height="56" rx="2" fill="var(--card)" stroke="currentColor" stroke-width="1.3"/>
       <text x="576" y="371" text-anchor="middle" font-size="13" font-weight="700">캘린더 신규 일정 생성</text>
-      <text x="576" y="389" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">일정 에이전트 미니앱 반영</text>
+      <text x="576" y="389" text-anchor="middle" font-size="10.5" fill="var(--ink-soft)">확정 일정 반영</text>
 
       <!-- B1 -> B2 -->
       <line x1="576" y1="404" x2="576" y2="434" stroke="currentColor" stroke-width="1.3" marker-end="url(#arrow)"/>
@@ -200,7 +199,7 @@
       <text x="1113" y="801" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink-soft)" transform="rotate(-90 1113 801)">회장님 — Task 진행현황 상시 확인 · 보고</text>
 
     </svg>
-    <figcaption>Task 생성 → 자료 업로드로 첫 미팅을 준비합니다. 업무지원실이 희망 일정을 제안하면 비서실이 실제 일정을 조율·확정하고, 그 결과가 캘린더 등록·브리핑 발송으로 이어져 회장님이 텔레그램에서 일정과 AI 토킹포인트를 확인합니다. 미팅 후에는 지시사항 기반 자료 추가와 회의록 등록이 이어지고, 추가 미팅·자료가 필요하면 주황 화살표를 따라 각각 희망 일정 제안·자료 추가 단계로 되돌아갑니다. 보고자료가 완성되면 텔레그램 알림과 질의응답으로 마무리되며, 이 과정 전체가 회장님에게 Task 진행현황으로 상시 보고됩니다.</figcaption>
+    <figcaption>Task 생성 → 자료 업로드로 첫 미팅을 준비합니다. 업무지원실은 희망 일정만 제안하고, 실제 일정 조율·확정은 <b>일정 에이전트 쪽에서 비서실이</b> 처리합니다 — 확정된 일정이 캘린더 등록·브리핑 발송으로 이어져 회장님이 텔레그램에서 일정과 AI 토킹포인트를 확인합니다. 미팅 후에는 지시사항 기반 자료 추가와 회의록 등록이 이어지고, 추가 미팅·자료가 필요하면 주황 화살표를 따라 각각 희망 일정 제안·자료 추가 단계로 되돌아갑니다. 보고자료가 완성되면 텔레그램 알림과 질의응답으로 마무리되며, 이 과정 전체가 회장님에게 Task 진행현황으로 상시 보고됩니다.</figcaption>
   </figure>
 
   <div class="legend">
