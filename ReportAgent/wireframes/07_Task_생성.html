@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Task 생성 — 보고회의 Agent</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
+<style>
+  :root{
+    --bg:#F5F5F7;
+    --ink:#15171C; --ink-soft:#6B6E76; --ink-faint:#9A9CA3;
+    --card:#FFFFFF; --card-soft:#F7F7F8;
+    --line:#E7E7EA;
+    --danger:#E5484D; --danger-soft:#FDECEC;
+    --blue:#3E63DD; --blue-soft:#EDF1FD;
+    --ok:#1F8A5F; --ok-soft:#E6F4EC;
+    --font:'Pretendard Variable','Pretendard',-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html{word-break:keep-all;overflow-wrap:break-word;}
+  body{margin:0; background:var(--bg); font-family:var(--font); color:var(--ink); padding:28px;}
+
+  .app{max-width:760px; margin:0 auto; background:var(--card); border:1px solid var(--line); border-radius:20px; overflow:hidden;}
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:16px 28px; border-bottom:1px solid var(--line);
+    background:var(--ink); color:#E9E9EC;
+  }
+  .topbar .crumb{font-size:12px; color:#9A9CA3;}
+  .topbar .crumb b{color:#fff;}
+  .topbar .close{
+    width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.1);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; opacity:.85; cursor:pointer; text-decoration:none; color:inherit;
+  }
+
+  .content{padding:32px 36px 40px;}
+  .page-head h1{font-size:22px; margin:0 0 6px; font-weight:800; letter-spacing:-.01em;}
+  .page-head .desc{font-size:13px; color:var(--ink-faint); margin-bottom:28px;}
+
+  .group{background:var(--card-soft); border:1px solid var(--line); border-radius:16px; margin-bottom:16px; padding:20px 22px;}
+  .group-head{font-size:11px; font-weight:700; letter-spacing:.05em; color:var(--ink-faint); text-transform:uppercase; margin-bottom:16px;}
+  .group-head .opt{text-transform:none; letter-spacing:0; font-weight:400; color:var(--ink-faint);}
+
+  .field{margin-bottom:16px;}
+  .field:last-child{margin-bottom:0;}
+  label{display:block; font-size:12.5px; font-weight:700; margin-bottom:7px;}
+  label .req{color:var(--danger); margin-left:2px;}
+  label .desc{font-weight:400; color:var(--ink-faint); font-size:11px; margin-left:6px;}
+
+  input[type=text], select, textarea{
+    width:100%; padding:11px 14px;
+    border:1px solid var(--line); border-radius:10px;
+    font-size:13.5px; font-family:inherit;
+    background:#fff; color:var(--ink);
+  }
+  textarea{resize:vertical; line-height:1.6;}
+  input[type=text]:focus, select:focus, textarea:focus{
+    outline:none; border-color:var(--ink); box-shadow:0 0 0 3px rgba(21,23,28,.08);
+  }
+
+  .field-row{display:flex; gap:10px;}
+  .field-row > div{flex:1;}
+
+  .dropzone{
+    border:1.5px dashed #C7C8CC;
+    border-radius:14px;
+    padding:22px; text-align:center; font-size:13px; color:var(--ink-soft);
+    background:#fff;
+  }
+  .dropzone .icon{font-size:20px; margin-bottom:8px; color:var(--ink-faint);}
+
+  .info-box{
+    border:1px solid var(--line);
+    background:var(--blue-soft);
+    border-radius:14px;
+    padding:16px 18px;
+    font-size:12.5px; color:#334; line-height:1.7;
+    margin-bottom:24px;
+  }
+  .info-box b{display:block; margin-bottom:6px; color:var(--blue);}
+
+  .submit-row{display:flex; justify-content:flex-end; gap:10px;}
+  .btn{padding:11px 22px; font-size:13.5px; font-weight:700; border-radius:10px; cursor:pointer; border:none;}
+  .btn.primary{background:var(--ink); color:#fff;}
+  .btn.ghost{background:#fff; color:var(--ink); border:1px solid var(--line);}
+
+  .auto-note{font-size:11.5px; color:var(--ink-faint); margin-top:10px; text-align:right;}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="topbar">
+    <span class="crumb">Admin &gt; 태스크 관리 &gt; <b>Task 생성</b></span>
+    <a class="close" href="06_Task_관리.html">✕</a>
+  </div>
+
+  <div class="content">
+    <div class="page-head">
+      <h1>새 Task 생성</h1>
+      <div class="desc">생성 즉시 Task 목록에 반영되며, 이후 자료 추가·회의록 등록 등 사후관리도 이 Task를 기준으로 진행됩니다.</div>
+    </div>
+
+    <div class="group">
+      <div class="group-head">기본 정보</div>
+      <div class="field">
+        <label>Task 제목<span class="req">*</span></label>
+        <input type="text" value="마케팅팀 협력사 계약 갱신 검토">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>담당 조직 <span class="desc">부서 또는 담당자명</span></label>
+          <input type="text" value="마케팅팀 최OO">
+        </div>
+        <div class="field">
+          <label>마감일<span class="req">*</span></label>
+          <input type="text" value="2026-10-02">
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-head">지시 내용</div>
+      <div class="field">
+        <label>내용<span class="req">*</span> <span class="desc">무엇을 준비·확인해야 하는지</span></label>
+        <textarea rows="4">기존 광고대행사 계약 만료(10/15)를 앞두고 갱신 조건을 재검토합니다. 최근 캠페인 성과 데이터를 근거로 수수료율 조정 여부를 판단해 회신안을 준비합니다.</textarea>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-head">관련 자료 <span class="opt">(선택 · 이후에도 추가 가능)</span></div>
+      <div class="field">
+        <div class="dropzone">
+          <div class="icon">⇧</div>
+          문서를 여기로 끌어다 놓거나 클릭하여 업로드
+        </div>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-head">일정 · 연결 <span class="opt">(선택)</span></div>
+      <div class="field">
+        <label>희망 일정 <span class="desc">원하는 시간대만 제안 — 실제 조율·확정은 비서실이 일정 에이전트에서 진행합니다</span></label>
+        <div class="field-row">
+          <div><input type="text" value="2026-10-01"></div>
+          <div><input type="text" value="14:00"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>관련 보고서 연결 <span class="desc">이 Task의 출처가 되는 보고서가 있다면</span></label>
+        <select>
+          <option>연결 안 함</option>
+          <option>RPT-2026-0091 · 3분기 신사업 투자 검토 보고서</option>
+          <option>RPT-2026-0089 · 해외법인 실적 점검 보고</option>
+          <option>RPT-2026-0087 · 마케팅 캠페인 성과 보고</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <b>생성 시 자동 처리 안내</b>
+      Task가 생성되면 담당 조직에 알림이 전달되고, 희망 일정을 입력한 경우 일정 에이전트로 조율 요청이 자동 전달됩니다. 보고회의 에이전트는 이후 업로드되는 자료를 점검 프레임 기준으로 자동 검수합니다.
+    </div>
+
+    <div class="submit-row">
+      <button class="btn ghost">임시 저장</button>
+      <button class="btn primary">Task 생성</button>
+    </div>
+    <div class="auto-note">생성 후 Task 관리 목록에서 바로 확인할 수 있습니다.</div>
+
+  </div>
+</div>
+
+</body>
+</html>
