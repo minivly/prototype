@@ -122,7 +122,7 @@
 <div class="doc">
   <div class="topbar">
     <div class="topbar__inner">
-      <div class="topbar__title">TM Avatar<span>CEO 버전 · 텔레그램 시나리오 · v1.1</span></div>
+      <div class="topbar__title">TM Avatar<span>CEO 버전 · 텔레그램 시나리오 · v1.2</span></div>
       <nav class="topnav">
         <a href="#scope">범위 &amp; 개념</a>
         <a href="#matrix">질문 유형 매트릭스</a>
@@ -139,7 +139,7 @@
       <h1 class="title">TM Avatar CEO 버전 — 텔레그램 메시지 시나리오</h1>
       <p class="lede">계열사 CEO가 그룹 회장님을 대변하는 <b>TM Avatar</b>에게 텔레그램으로 직접 질문하고 답을 받는 전용 채널입니다. 미니앱 없이 <b>텔레그램 챗으로만</b> 제공되며, 기존 "구성원의 VOICE" 시스템과는 별개로 <b>CEO ↔ TM Avatar 1:1 대화</b>입니다. CEO가 교체되더라도 히스토리는 계열사 단위로 이어집니다. 단순 질의응답을 넘어 <b>전략 검토·Speech 작성처럼 실제 산출물이 필요한 요청</b>에는 판단기준·리스크·점검질문·실제초안 4단 구조로 답하는 경영 코파일럿(Decision Copilot)입니다.</p>
       <div class="metarow">
-        <span><b>버전</b> v1.1</span>
+        <span><b>버전</b> v1.2</span>
         <span><b>작성일</b> 2026-08-19</span>
         <span><b>보는 사람</b> 계열사 CEO (각자 개별 대화방)</span>
         <span><b>답변 주체</b> TM Avatar · 민감 사안은 검수·이관</span>
@@ -225,7 +225,7 @@
       <div class="sec-head">
         <span class="sec-num">02 · Question Matrix</span>
         <h2 class="sec-title">질문 유형별 응답 매트릭스</h2>
-        <p class="sec-desc">CEO가 실제로 물어볼 법한 질문을 12개 유형으로 묶고, 각각 어떻게 처리하는지 정리했습니다. 아래 시나리오 A~H는 이 중 대표 유형을 구체적인 메시지 예시로 풀어낸 것입니다.</p>
+        <p class="sec-desc">CEO가 실제로 물어볼 법한 질문을 12개 유형으로 묶고, 각각 어떻게 처리하는지 정리했습니다. 아래 시나리오 A~L은 12개 유형 전체를 구체적인 메시지 예시로 풀어낸 것입니다.</p>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -233,12 +233,12 @@
           <tbody>
             <tr><td>전략 방향 확인형</td><td>"AI 투자 관련 그룹 차원 우선순위가 궁금합니다"</td><td><span class="phase-chip phase-chip--auto">자동</span></td><td><a href="#scn-a">A</a></td></tr>
             <tr><td>의사결정 재가·의견 요청형</td><td>"이번 M&amp;A 건에 대한 의견을 여쭙고 싶습니다"</td><td><span class="phase-chip phase-chip--escalate">직접 확인</span></td><td><a href="#scn-b">B</a></td></tr>
-            <tr><td>계열사간 협업·시너지 조율형</td><td>"타 계열사와의 협력 방안에 대한 생각이 궁금합니다"</td><td><span class="phase-chip phase-chip--partial">부분 이관</span></td><td>—</td></tr>
+            <tr><td>계열사간 협업·시너지 조율형</td><td>"타 계열사와의 협력 방안에 대한 생각이 궁금합니다"</td><td><span class="phase-chip phase-chip--partial">부분 이관</span></td><td><a href="#scn-i">I</a></td></tr>
             <tr><td>위기·리스크 대응 자문형</td><td>"이번 이슈 대응 방향을 여쭙고 싶습니다"</td><td><span class="phase-chip phase-chip--escalate">직접 확인</span></td><td><a href="#scn-e">E</a></td></tr>
-            <tr><td>인사·조직 자문형</td><td>"핵심 인재 이탈 문제에 대해 조언을 구합니다"</td><td><span class="phase-chip phase-chip--partial">부분 이관</span></td><td>—</td></tr>
-            <tr><td>성과·실적 보고 및 피드백 요청형</td><td>"이번 분기 실적을 보고드리고 피드백을 듣고 싶습니다"</td><td><span class="phase-chip phase-chip--auto">자동</span></td><td>—</td></tr>
+            <tr><td>인사·조직 자문형</td><td>"핵심 인재 이탈 문제에 대해 조언을 구합니다"</td><td><span class="phase-chip phase-chip--partial">부분 이관</span></td><td><a href="#scn-j">J</a></td></tr>
+            <tr><td>성과·실적 보고 및 피드백 요청형</td><td>"이번 분기 실적을 보고드리고 피드백을 듣고 싶습니다"</td><td><span class="phase-chip phase-chip--auto">자동</span></td><td><a href="#scn-k">K</a></td></tr>
             <tr><td>원칙·철학 재확인형</td><td>"이 상황에서 어떤 원칙을 우선해야 할지 궁금합니다"</td><td><span class="phase-chip phase-chip--auto">자동</span></td><td><a href="#scn-c">C</a></td></tr>
-            <tr><td>대외 이슈 대응 자문형</td><td>"정부 정책 변화 대응 방향이 궁금합니다"</td><td><span class="phase-chip phase-chip--partial">부분 이관</span></td><td>—</td></tr>
+            <tr><td>대외 이슈 대응 자문형</td><td>"정부 정책 변화 대응 방향이 궁금합니다"</td><td><span class="phase-chip phase-chip--partial">부분 이관</span></td><td><a href="#scn-l">L</a></td></tr>
             <tr><td>리더십 멘토링형</td><td>"리더로서 어떻게 판단해야 할지 조언 부탁드립니다"</td><td><span class="phase-chip phase-chip--auto">자동</span></td><td><a href="#scn-f">F</a></td></tr>
             <tr><td>인수인계·히스토리 조회형</td><td>"저희 회사와 관련해 최근 중요하게 보신 이슈가 있었나요"</td><td><span class="phase-chip phase-chip--auto">자동</span></td><td><a href="#scn-d">D</a></td></tr>
             <tr><td>전략 검토·보고 준비 지원형</td><td>"이 전략안 검토 부탁드립니다 (요약 첨부)"</td><td><span class="phase-chip phase-chip--auto">자동 · 4단 구조</span></td><td><a href="#scn-g">G</a></td></tr>
@@ -253,7 +253,7 @@
       <div class="sec-head">
         <span class="sec-num">03 · Message Scenarios</span>
         <h2 class="sec-title">텔레그램 메시지 시나리오</h2>
-        <p class="sec-desc">12개 유형 중 처리 방식이 다른 대표 사례를 골라 실제 대화 형태로 보였습니다.</p>
+        <p class="sec-desc">12개 유형 전체를 실제 대화 형태로 보였습니다.</p>
       </div>
 
       <div class="scenario" id="scn-a">
@@ -322,6 +322,31 @@
           <li><b>즉시 "직접 확인 필요"임을 밝힙니다</b> — TM Avatar가 그럴듯하게 답을 지어내면 CEO가 이를 실제 재가로 오인할 수 있어, 애매하게 답하지 않고 바로 이관 사실을 알립니다.</li>
           <li>회장님이 실제로 보낸 회신은 <b>"회장님 직접 회신" 배지</b>로 명확히 구분해, AI가 생성한 답변과 섞이지 않게 합니다.</li>
         </ul>
+      </div>
+
+      <div class="scenario" id="scn-c">
+        <div class="scenario__head">
+          <h3>C. 원칙·철학 재확인 — 자동 응답</h3>
+          <span class="trigger-tag">TRIGGER: 판단 기준이 필요한 상황 문의</span>
+          <span class="phase-chip phase-chip--auto">자동</span>
+        </div>
+        <p class="scenario__desc">새로운 재가가 필요한 사안이 아니라, "이런 경우 회장님 기준이 뭐였지"를 확인하는 질문은 과거 발언을 근거로 바로 답합니다.</p>
+        <div class="mockrow" style="--n:1">
+          <div class="phone" style="max-width:300px; margin:0 auto;">
+            <div class="phone__bezel"><div class="phone__screen phone__screen--short">
+              <div class="tg-head"><span class="tg-head__avatar">TM</span><div><div class="tg-head__name">TM Avatar</div><div class="tg-head__sub">회장님 Avatar · AI</div></div></div>
+              <div class="tg-body">
+                <div class="tg-date">오늘 13:10</div>
+                <div class="msg msg--user">협력사와의 계약 조건을 조정 중인데, 단가를 낮출지 장기 관계를 우선할지 고민입니다. 이런 경우 원칙이 있을까요?</div>
+                <div class="msg msg--bot">회장님께서는 협력사 관계에 대해 "단기 원가 절감보다 신뢰를 바탕으로 한 장기 협력이 결국 더 큰 이익"이라고 여러 차례 말씀하셨습니다.
+
+단가 인하가 협력사와의 관계를 해칠 수준이라면, 장기 계약·물량 안정성 같은 다른 조건으로 절충하시는 방향을 권해드립니다.
+<div class="src-note">출처 · 2024 공급망 파트너십 세미나 발언록</div></div>
+              </div>
+            </div></div>
+            <div class="phone__label">CEO</div>
+          </div>
+        </div>
       </div>
 
       <div class="scenario" id="scn-d">
@@ -416,6 +441,111 @@
           </div>
         </div>
       </div>
+
+      <div class="scenario" id="scn-i">
+        <div class="scenario__head">
+          <h3>I. 계열사간 협업 조율 — 부분 이관</h3>
+          <span class="trigger-tag">TRIGGER: 타 계열사와의 협업 방향 문의</span>
+          <span class="phase-chip phase-chip--partial">부분 이관</span>
+        </div>
+        <p class="scenario__desc">방향성 판단은 회장님 원칙을 근거로 자동 응답하되, 실제 자원·예산 조율처럼 구체적 실행은 CEO가 원할 때만 이관하도록 버튼으로 분리합니다.</p>
+        <div class="mockrow" style="--n:1">
+          <div class="phone" style="max-width:300px; margin:0 auto;">
+            <div class="phone__bezel"><div class="phone__screen phone__screen--tall">
+              <div class="tg-head"><span class="tg-head__avatar">TM</span><div><div class="tg-head__name">TM Avatar</div><div class="tg-head__sub">회장님 Avatar · AI</div></div></div>
+              <div class="tg-body">
+                <div class="tg-date">오늘 14:02</div>
+                <div class="msg msg--user">반도체 소재 계열사와 배터리 소재 계열사 간 공동 R&amp;D를 검토 중인데, 그룹 차원에서 어떻게 보시는지 궁금합니다.</div>
+                <div class="msg msg--bot">회장님께서는 "계열사 간 경계보다 고객 가치가 우선"이라며 R&amp;D 자원 공유를 여러 차례 강조하셨습니다. 방향 자체는 원칙에 부합합니다.
+
+다만 구체적인 예산·인력 배분은 각 계열사 전략기획실 간 협의가 필요한 사안입니다.
+<div class="src-note">출처 · 2026-06 그룹 전략회의 발언록</div></div>
+                <div class="tg-kb"><div class="tg-kb__btn">그룹 전략기획실에 조율 요청</div></div>
+              </div>
+            </div></div>
+            <div class="phone__label">CEO</div>
+          </div>
+        </div>
+        <ul class="notes">
+          <li>방향성 판단은 <b>자동으로 즉답</b>하되, 실행 단계의 자원 조율은 <b>버튼으로 이관 여부를 CEO가 직접 선택</b>하게 합니다 — 필요 없으면 누르지 않아도 됩니다.</li>
+        </ul>
+      </div>
+
+      <div class="scenario" id="scn-j">
+        <div class="scenario__head">
+          <h3>J. 인사·조직 자문 — 부분 이관</h3>
+          <span class="trigger-tag">TRIGGER: 인사·조직 관련 고민 상담</span>
+          <span class="phase-chip phase-chip--partial">부분 이관</span>
+        </div>
+        <p class="scenario__desc">일반 원칙은 자동으로 답하고, 처우·보상처럼 실제 승인이 필요한 부분은 별도 확인이 필요함을 답변 안에서 바로 구분해 안내합니다.</p>
+        <div class="mockrow" style="--n:1">
+          <div class="phone" style="max-width:300px; margin:0 auto;">
+            <div class="phone__bezel"><div class="phone__screen phone__screen--short">
+              <div class="tg-head"><span class="tg-head__avatar">TM</span><div><div class="tg-head__name">TM Avatar</div><div class="tg-head__sub">회장님 Avatar · AI</div></div></div>
+              <div class="tg-body">
+                <div class="tg-date">오늘 09:50</div>
+                <div class="msg msg--user">핵심 개발 인력의 이탈 조짐이 있어 조언을 구하고 싶습니다.</div>
+                <div class="msg msg--bot">회장님께서는 "핵심 인재는 보상보다 성장 기회로 붙잡으라"고 강조해오셨습니다. 새로운 프로젝트나 역할 확대를 먼저 제안해보시길 권해드립니다.
+
+다만 보상 체계 조정이 필요하다면 이는 인사팀·회장님 결재가 필요한 영역이라 별도로 여쭤보셔야 합니다.
+<div class="src-note">출처 · 2025 계열사 CEO 워크숍 발언록</div></div>
+              </div>
+            </div></div>
+            <div class="phone__label">CEO</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario" id="scn-k">
+        <div class="scenario__head">
+          <h3>K. 실적 보고 · 피드백 요청 — 자동 응답</h3>
+          <span class="trigger-tag">TRIGGER: 분기 실적 보고 후 피드백 요청</span>
+          <span class="phase-chip phase-chip--auto">자동</span>
+        </div>
+        <p class="scenario__desc">회장님이 실적 보고 때 반복적으로 보여온 피드백 패턴을 근거로, 실제 확인 전에도 참고할 만한 관점을 먼저 제공합니다.</p>
+        <div class="mockrow" style="--n:1">
+          <div class="phone" style="max-width:300px; margin:0 auto;">
+            <div class="phone__bezel"><div class="phone__screen phone__screen--short">
+              <div class="tg-head"><span class="tg-head__avatar">TM</span><div><div class="tg-head__name">TM Avatar</div><div class="tg-head__sub">회장님 Avatar · AI</div></div></div>
+              <div class="tg-body">
+                <div class="tg-date">오늘 17:30</div>
+                <div class="msg msg--user">이번 분기 실적을 보고드리고 싶습니다. 매출은 전년 대비 12% 성장했지만 영업이익률은 0.5%p 하락했습니다.</div>
+                <div class="msg msg--bot">회장님께서는 실적 보고를 받으실 때 매출 성장률보다 수익성 개선 여부를 먼저 확인하십니다.
+
+이번 분기는 매출 성장에도 영업이익률이 하락한 만큼, 원가 구조나 일회성 비용 요인을 먼저 짚어드리는 보고 순서를 권해드립니다.
+<div class="src-note">출처 · 최근 3개 분기 실적보고 회신 패턴</div></div>
+              </div>
+            </div></div>
+            <div class="phone__label">CEO</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scenario" id="scn-l">
+        <div class="scenario__head">
+          <h3>L. 대외 이슈 대응 자문 — 부분 이관</h3>
+          <span class="trigger-tag">TRIGGER: 정책·시장 변화 대응 문의</span>
+          <span class="phase-chip phase-chip--partial">부분 이관</span>
+        </div>
+        <p class="scenario__desc">원칙적인 대응 기조는 자동으로 답하고, 구체적인 대관·대외협력 실행은 담당 조직 조율이 필요함을 안내합니다.</p>
+        <div class="mockrow" style="--n:1">
+          <div class="phone" style="max-width:300px; margin:0 auto;">
+            <div class="phone__bezel"><div class="phone__screen phone__screen--short">
+              <div class="tg-head"><span class="tg-head__avatar">TM</span><div><div class="tg-head__name">TM Avatar</div><div class="tg-head__sub">회장님 Avatar · AI</div></div></div>
+              <div class="tg-body">
+                <div class="tg-date">오늘 11:15</div>
+                <div class="msg msg--user">정부의 반도체 보조금 정책이 바뀔 조짐이 있는데, 대응 방향이 궁금합니다.</div>
+                <div class="msg msg--bot">회장님께서는 "정책 변화에는 유연하게 대응하되, 핵심 투자 기조는 흔들지 않는다"는 원칙을 강조해오셨습니다.
+
+구체적인 대관 대응 전략은 그룹 대외협력팀과의 조율이 필요한 사안이라, 원하시면 연결해드리겠습니다.
+<div class="src-note">출처 · 2025 산업정책 간담회 발언록</div></div>
+              </div>
+            </div></div>
+            <div class="phone__label">CEO</div>
+          </div>
+        </div>
+      </div>
+
       <div class="scenario" id="scn-g">
         <div class="scenario__head">
           <h3>G. 전략 검토 지원 — 4단 구조</h3>
@@ -521,7 +651,7 @@
   </div>
 
   <footer class="doc-foot">
-    <div class="wrap">TM Avatar CEO 버전 — 텔레그램 메시지 시나리오 · v1.1 · 내부 검토용 · <a href="tm-avatar-voice.html">TM Avatar — 구성원의 VOICE →</a></div>
+    <div class="wrap">TM Avatar CEO 버전 — 텔레그램 메시지 시나리오 · v1.2 · 내부 검토용 · <a href="tm-avatar-voice.html">TM Avatar — 구성원의 VOICE →</a></div>
   </footer>
 </div>
 </body>
